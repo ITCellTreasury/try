@@ -161,6 +161,96 @@
         </div>
       </div>
     </section><!-- /Hero Section -->
+	 <!-- Announcement Section  -->
+<section id="faq" class="faq section">
+      <!-- Section Title -->
+      <div class="container section-title aos-init aos-animate" data-aos="fade-up" style="padding-bottom: 10px!important;" >
+        <h2>Notice Board</h2>
+        <p>Announcements</p>
+      </div><!-- End Section Title -->
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
+            <div class="faq-container">
+              <div class="faq-item">
+               <marquee behavior="scroll" direction="up" scrollamount="2">   
+ <table id="announceTable" class="myTable">
+        <thead>
+            <tr>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here dynamically -->
+        </tbody>
+    </table>
+	</marquee>
+	<style>
+announceTable {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+td, th {
+  border: 1px solid #f1f1f1;
+  text-align: left;
+  padding: 10px;
+}
+
+</style>
+    <script>
+        const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
+        const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
+        const range = "announcements!A2:C"; // Data range
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Fetch data from Google Sheets API
+            fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    const rows = data.values;
+                    const tbody = document.querySelector("#announceTable tbody");
+
+                    rows.forEach(row => {
+                        const tr = document.createElement("tr");
+                        row.forEach(cell => {
+                            const td = document.createElement("td");
+                            td.textContent = cell;
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+
+                    // Initialize DataTable after data is populated
+                    $("#announceTable").myTable();
+
+                    // Hide the preloader
+                    document.getElementById("preloader").style.display = "none";
+                })
+                .catch(error => {
+                    console.error("Error fetching data: ", error);
+
+                    // Hide the preloader in case of an error
+                    document.getElementById("preloader").style.display = "none";
+                });
+        });
+    </script>
+                
+                
+              </div><!-- End Faq item-->
+
+            </div>
+
+          </div><!-- End Faq Column-->
+
+        </div>
+
+      </div>
+
+    </section>
+ <!-- Announcement Section  -->
+	
     <!-- About Section -->
     <section id="about" class="about section">
       <div class="container" data-aos="fade-up">
@@ -486,7 +576,7 @@
 		<form id="contactForm" method="post" class="php-email-form aos-init aos-animate" data-aos="fade-up" data-aos-delay="200" onsubmit="submitForm(event)">
   <div class="row gy-4">
     <div class="col-md-12">
-   <input type="text" name="name" class="form-control" placeholder="Your Name" required="" oninput="this.value = this.value.toUpperCase()">
+     <input type="text" name="name" class="form-control" placeholder="Your Name" required="" oninput="this.value = this.value.toUpperCase()">
     </div>
     <div class="col-md-12">
       <input type="email" class="form-control" name="email" placeholder="Your Email" id="emailInput" autocomplete="email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA0-9.-]+\.[a-zA-Z]{2,}$">
@@ -510,8 +600,8 @@
       <!-- Submit Button -->
       <button type="submit" id="submitBtn" class="btn btn-primary mt-3">Send Message</button>
     </div>
-  </div>
-</form>    </div>
+  </div></div>
+</form>    
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
