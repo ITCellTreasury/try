@@ -29,7 +29,8 @@
 
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
-
+  <!-- Sweet Alert -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- =======================================================
   * Template Name: IT Cell Treasury
   * Template URL: 
@@ -54,7 +55,7 @@
             // setTimeout(function() { // Simulate loading time for testing
                 // Hide the preloader and show the main content after loading
                 document.getElementById("preloader").style.display = "none";
-                document.getElementById("mainContent").style.display = "block";
+               
             // }, 3000); // Uncomment for a 3-second simulated loading delay
         });
     </script>
@@ -490,28 +491,127 @@
             </div>
           </div>
           <div class="col-lg-6">
-            <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-              <div class="row gy-4">
-                <div class="col-md-6">
-                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
-                </div>
-                <div class="col-md-6 ">
-                  <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
-                </div>
-                <div class="col-12">
-                  <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
-                </div>
-                <div class="col-12">
-                  <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
-                </div>
-                <div class="col-12 text-center">
-                  <div class="loading">Loading</div>
-                  <div class="error-message"></div>
-                  <div class="sent-message">Your message has been sent. Thank you!</div>
-                  <button type="submit">Send Message</button>
-                </div>
-              </div>
-            </form>
+		<form id="contactForm" method="post" class="php-email-form aos-init aos-animate" data-aos="fade-up" data-aos-delay="200" onsubmit="submitForm(event)">
+  <div class="row gy-4">
+    <div class="col-md-12">
+      <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+    </div>
+    <div class="col-md-12">
+      <input type="email" class="form-control" name="email" placeholder="Your Email" id="emailInput" autocomplete="email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA0-9.-]+\.[a-zA-Z]{2,}$">
+    </div>
+    <div class="col-md-6">
+      <input type="text" class="form-control" name="phone" placeholder="Your Contact Number" id="phoneInput" required pattern="^\+91\d{10}$" title="Phone number must start with +91 followed by 10 digits.">
+    </div>
+    <div class="col-12">
+      <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+    </div>
+    <div class="col-12">
+      <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+    </div>
+    <div class="col-12 text-center">
+      <!-- Color Dot Spinner hidden by default -->
+      <div id="spinner" class="dot-spinner" style="display: none;">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <!-- Submit Button -->
+      <button type="submit" id="submitBtn" class="btn btn-primary mt-3">Send Message</button>
+    </div>
+  </div>
+</form>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  /* Dot Spinner CSS */
+  .dot-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #007bff; /* Default blue color for dots */
+    animation: dotAnimation 1.2s infinite ease-in-out;
+  }
+
+  .dot:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes dotAnimation {
+    0% {
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+</style>
+
+<script>
+  document.getElementById("contactForm").onsubmit = function(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    var submitButton = document.getElementById("submitBtn");
+    var spinner = document.getElementById("spinner");
+
+    // Show spinner and hide the button
+    spinner.style.display = "flex";
+    submitButton.style.display = "none";
+
+    var formData = new FormData(this);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://script.google.com/macros/s/AKfycbwU54xzAHcZhDYi_a0nuE6GOqyjPHSTW7-EKwAPnjnP5vT3wNCUzWjF152EEPeMIdrJeA/exec", true);
+    
+    xhr.onload = function() {
+      // Hide spinner and show the submit button after response
+      spinner.style.display = "none";
+      submitButton.style.display = "inline-block";
+
+      if (xhr.status == 200) {
+        var referenceId = xhr.responseText; // Receive reference ID from the server
+        // Show SweetAlert success message with the reference ID
+        Swal.fire({
+          title: 'Success!',
+          html: 'Your submission has been received.<br><br><b>Reference ID:</b> ' + referenceId,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(function() {
+          document.getElementById("contactForm").reset(); // Reset the form after submission
+        });
+      } else {
+        // Error handling if the form submission fails
+        Swal.fire({
+          title: 'Error!',
+          text: 'There was an issue submitting your form. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    };
+
+    xhr.send(formData);
+  };
+</script>
           </div><!-- End Contact Form -->
         </div>
       </div>
