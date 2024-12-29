@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://itcelltreasury.github.io/try/sitemap.xml
