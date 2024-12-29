@@ -486,7 +486,7 @@
 		<form id="contactForm" method="post" class="php-email-form aos-init aos-animate" data-aos="fade-up" data-aos-delay="200" onsubmit="submitForm(event)">
   <div class="row gy-4">
     <div class="col-md-12">
-      <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+   <input type="text" name="name" class="form-control" placeholder="Your Name" required="" oninput="this.value = this.value.toUpperCase()">
     </div>
     <div class="col-md-12">
       <input type="email" class="form-control" name="email" placeholder="Your Email" id="emailInput" autocomplete="email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA0-9.-]+\.[a-zA-Z]{2,}$">
