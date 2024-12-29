@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .form-container input, .form-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-container button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <!-- SweetAlert2 Library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Contact Us</h2>
+        <form id="contactForm">
+            <input type="text" id="name" name="name" placeholder="Your Name" required><br>
+            <input type="email" id="email" name="email" placeholder="Your Email" required><br>
+            <input type="text" id="subject" name="subject" placeholder="Subject" required><br>
+            <textarea id="message" name="message" placeholder="Your Message" required></textarea><br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            const formData = {
+                name: name,
+                email: email,
+                subject: subject,
+                message: message
+            };
+
+            // Replace this with the URL of your deployed Google Apps Script Web App
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbyLxWoYsuzU6hWSRkPFNkFQ9kKC9p2gLlQdyYzU4jVDmvbcaeCBSGWR-t8tGYfnluuVSg/exec';
+
+            fetch(scriptUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    // Show SweetAlert message with the unique ID
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Successfully Submitted!',
+                        text: 'Your reference ID is: ' + data.uniqueId,
+                    });
+                    document.getElementById('contactForm').reset();
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'There was an error submitting your message. Please try again later.',
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
