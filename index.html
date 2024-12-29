@@ -47,11 +47,58 @@
   "keywords": "IT Cell, Treasury, District Treasury, Trivandrum, TSB Online, Pension Portal, Treasury IT Cell"
 }
 </script>
+<script>
+        // Wait for the page to fully load before removing the preloader
+        document.addEventListener("DOMContentLoaded", () => {
+            // You can simulate some async loading if needed, for example:
+            // setTimeout(function() { // Simulate loading time for testing
+                // Hide the preloader and show the main content after loading
+                document.getElementById("preloader").style.display = "none";
+                document.getElementById("mainContent").style.display = "block";
+            // }, 3000); // Uncomment for a 3-second simulated loading delay
+        });
+    </script>
+<style>
+        /* Preloader styling */
+        #preloader {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9); /* White background with slight transparency */
+            z-index: 9999;
+        }
 
+        #preloader .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body class="index-page">
-
+   <!-- Preloader -->
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+	
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
