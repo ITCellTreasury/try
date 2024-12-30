@@ -85,85 +85,6 @@
             }
         }
     </style>
-   <style>
-    /* Basic styles for the marquee container */
-    .marquee-container {
-      width: 100%;
-      height: 300px;
-      overflow: hidden;
-      position: relative;
-      background-color: transparent; /* Transparent background */
-      animation: scrollUp 10s linear infinite; /* Continuous scrolling */
-      animation-play-state: running; /* Ensure the animation is running by default */
-    }
-
-    .marquee-content {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .marquee-item {
-      display: flex;
-      margin: 5px 0;
-      padding: 10px;
-    }
-
-    /* Column 1 - black text and stretched */
-    .col1 {
-      flex-grow: 1; /* Stretches to fill space */
-      padding: 5px;
-      text-align: left; /* Align text to the left */
-      color: black; /* Font color for the first column */
-      font-weight: bold; /* Make font bold */
-    }
-
-    /* Column 2 - blue text and stretched */
-    .col2 {
-      flex-grow: 1; /* Stretches to fill space */
-      padding: 5px;
-      text-align: left; /* Align text to the left */
-      color: blue; /* Font color for the second column */
-      font-weight: bold; /* Make font bold */
-    }
-
-    /* Column 3 - red text and stretched */
-    .col3 {
-      flex-grow: 1; /* Stretches to fill space */
-      padding: 5px;
-      text-align: left; /* Align text to the left */
-      color: red; /* Font color for the third column */
-      font-weight: bold; /* Make font bold */
-    }
-
-    /* Keyframes for continuous upward scroll */
-    @keyframes scrollUp {
-      0% {
-        top: 100%;
-      }
-      100% {
-        top: -100%;
-      }
-    }
-
-    /* Keyframes for fading out the last item */
-    @keyframes fadeOut {
-      0% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
-
-    /* Apply fade-out effect on the last marquee item */
-    .marquee-item:last-child {
-      animation: fadeOut 10s forwards; /* Make the last item fade out */
-    }
-  </style>
 </head>
 
 <body class="index-page">
@@ -256,7 +177,147 @@
              <div class="marquee-container" id="marqueeContainer">
     <div class="marquee-content" id="marqueeContent"></div>
   </div>
- 
+		        <style>
+    /* Basic styles for the marquee container */
+    .marquee-container {
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+      position: relative;
+      background-color: transparent; /* Transparent background */
+    }
+
+    .marquee-content {
+      position: absolute;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      animation: scrollUp 10s linear infinite; /* Continuous scrolling */
+    }
+
+    .marquee-item {
+      display: flex;
+      margin: 5px 0;
+      padding: 10px;
+    }
+
+    /* Column 1 - black text and stretched */
+    .col1 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: left; /* Align text to the left */
+      color: black; /* Font color for the first column */
+      font-weight: bold; /* Make font bold */
+    }
+
+    /* Column 2 - blue text and stretched */
+    .col2 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: left; /* Align text to the left */
+      color: blue; /* Font color for the second column */
+      font-weight: bold; /* Make font bold */
+    }
+
+    /* Column 3 - red text and stretched */
+    .col3 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: left; /* Align text to the left */
+      color: red; /* Font color for the third column */
+      font-weight: bold; /* Make font bold */
+    }
+
+    /* Keyframes for continuous upward scroll */
+    @keyframes scrollUp {
+      0% {
+        transform: translateY(100%); /* Start from the bottom */
+      }
+      100% {
+        transform: translateY(-100%); /* Scroll up to the top */
+      }
+    }
+
+    /* Keyframes for fading out the last item */
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* Apply fade-out effect on the last marquee item */
+    .marquee-item:last-child {
+      animation: fadeOut 10s forwards; /* Make the last item fade out */
+    }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
+      const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
+      const range = "announcements!A2:C"; // specify the range (Sheet name and columns)
+
+      const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+
+      // Get the marquee container element
+      const marqueeContainer = document.getElementById('marqueeContainer');
+
+      // Function to pause the animation
+      function pauseMarquee() {
+        document.querySelector('.marquee-content').style.animationPlayState = 'paused';
+      }
+
+      // Function to resume the animation
+      function resumeMarquee() {
+        document.querySelector('.marquee-content').style.animationPlayState = 'running';
+      }
+
+      // Event listeners to pause and resume scrolling on focus/blur
+      marqueeContainer.addEventListener('mouseenter', pauseMarquee); // When mouse hovers over the marquee, pause
+      marqueeContainer.addEventListener('mouseleave', resumeMarquee); // When mouse leaves, resume
+
+      // Fetch data from Google Sheets and populate the marquee
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const rows = data.values;
+          const marqueeContent = document.getElementById('marqueeContent');
+
+          // Process each row of data
+          rows.forEach(row => {
+            if (row.length === 3) {  // Ensures the row has 3 columns (A, B, and C)
+              const item = document.createElement('div');
+              item.classList.add('marquee-item');
+
+              // Create individual columns with transparent background, bold text, and stretched width
+              const col1 = document.createElement('div');
+              col1.classList.add('col1');
+              col1.textContent = row[0]; // Column 1
+
+              const col2 = document.createElement('div');
+              col2.classList.add('col2');
+              col2.textContent = row[1]; // Column 2
+
+              const col3 = document.createElement('div');
+              col3.classList.add('col3');
+              col3.textContent = row[2]; // Column 3
+
+              // Append the columns to the item and then append the item to the marquee content
+              item.appendChild(col1);
+              item.appendChild(col2);
+              item.appendChild(col3);
+              marqueeContent.appendChild(item);
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching data from Google Sheets:', error));
+    });
+  </script>
   
               </div><!-- End Faq item-->
 
@@ -784,67 +845,6 @@
     xhr.send(formData);
   };
 </script>
-	  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
-      const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
-      const range = "announcements!A2:C"; // specify the range (Sheet name and columns)
 
-      const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
-
-      // Get the marquee container element
-      const marqueeContainer = document.getElementById('marqueeContainer');
-
-      // Function to pause the animation
-      function pauseMarquee() {
-        marqueeContainer.style.animationPlayState = 'paused';
-      }
-
-      // Function to resume the animation
-      function resumeMarquee() {
-        marqueeContainer.style.animationPlayState = 'running';
-      }
-
-      // Event listeners to pause and resume scrolling on focus/blur
-      marqueeContainer.addEventListener('mouseenter', pauseMarquee); // When mouse hovers over the marquee, pause
-      marqueeContainer.addEventListener('mouseleave', resumeMarquee); // When mouse leaves, resume
-
-      // Fetch data from Google Sheets and populate the marquee
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          const rows = data.values;
-          const marqueeContent = document.getElementById('marqueeContent');
-
-          // Process each row of data
-          rows.forEach(row => {
-            if (row.length === 3) {  // Ensures the row has 3 columns (A, B, and C)
-              const item = document.createElement('div');
-              item.classList.add('marquee-item');
-
-              // Create individual columns with transparent background, bold text, and stretched width
-              const col1 = document.createElement('div');
-              col1.classList.add('col1');
-              col1.textContent = row[0]; // Column 1
-
-              const col2 = document.createElement('div');
-              col2.classList.add('col2');
-              col2.textContent = row[1]; // Column 2
-
-              const col3 = document.createElement('div');
-              col3.classList.add('col3');
-              col3.textContent = row[2]; // Column 3
-
-              // Append the columns to the item and then append the item to the marquee content
-              item.appendChild(col1);
-              item.appendChild(col2);
-              item.appendChild(col3);
-              marqueeContent.appendChild(item);
-            }
-          });
-        })
-        .catch(error => console.error('Error fetching data from Google Sheets:', error));
-    });
-  </script>
 </body>
 </html>
