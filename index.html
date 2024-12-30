@@ -85,7 +85,7 @@
             }
         }
     </style>
-  <style>
+   <style>
     /* Basic styles for the marquee container */
     .marquee-container {
       width: 100%;
@@ -253,71 +253,11 @@
             <div class="faq-container">
               <div class="faq-item">
                
-                <div class="marquee-container" id="marqueeContainer">
+             <div class="marquee-container" id="marqueeContainer">
     <div class="marquee-content" id="marqueeContent"></div>
   </div>
  
-  <script>
-    const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
-    const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
-    const range = "announcements!A2:C"; // specify the range (Sheet name and columns)
-
-    const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
-
-    // Get the marquee container element
-    const marqueeContainer = document.getElementById('marqueeContainer');
-
-    // Function to pause the animation
-    function pauseMarquee() {
-      marqueeContainer.style.animationPlayState = 'paused';
-    }
-
-    // Function to resume the animation
-    function resumeMarquee() {
-      marqueeContainer.style.animationPlayState = 'running';
-    }
-
-    // Event listeners to pause and resume scrolling on focus/blur
-    marqueeContainer.addEventListener('mouseenter', pauseMarquee); // When mouse hovers over the marquee, pause
-    marqueeContainer.addEventListener('mouseleave', resumeMarquee); // When mouse leaves, resume
-
-    // Fetch data from Google Sheets and populate the marquee
-    fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
-        const rows = data.values;
-        const marqueeContent = document.getElementById('marqueeContent');
-
-        // Process each row of data
-        rows.forEach(row => {
-          if (row.length === 3) {  // Ensures the row has 3 columns (A, B, and C)
-            const item = document.createElement('div');
-            item.classList.add('marquee-item');
-
-            // Create individual columns with transparent background, bold text, and stretched width
-            const col1 = document.createElement('div');
-            col1.classList.add('col1');
-            col1.textContent = row[0]; // Column 1
-
-            const col2 = document.createElement('div');
-            col2.classList.add('col2');
-            col2.textContent = row[1]; // Column 2
-
-            const col3 = document.createElement('div');
-            col3.classList.add('col3');
-            col3.textContent = row[2]; // Column 3
-
-            // Append the columns to the item and then append the item to the marquee content
-            item.appendChild(col1);
-            item.appendChild(col2);
-            item.appendChild(col3);
-            marqueeContent.appendChild(item);
-          }
-        });
-      })
-      .catch(error => console.error('Error fetching data from Google Sheets:', error));
-  </script>
-
+  
               </div><!-- End Faq item-->
 
             </div>
@@ -727,45 +667,7 @@
   }
 </style>
 
-<script>
-  document.getElementById("contactForm").onsubmit = function(e) {
-    e.preventDefault(); // Prevent default form submission
-    var submitButton = document.getElementById("submitBtn");
-    var spinner = document.getElementById("spinner");
-    // Show spinner and hide the button
-    spinner.style.display = "flex";
-    submitButton.style.display = "none";
-    var formData = new FormData(this);
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://script.google.com/macros/s/AKfycbwU54xzAHcZhDYi_a0nuE6GOqyjPHSTW7-EKwAPnjnP5vT3wNCUzWjF152EEPeMIdrJeA/exec", true);
-    xhr.onload = function() {
-      // Hide spinner and show the submit button after response
-      spinner.style.display = "none";
-      submitButton.style.display = "inline-block";
-      if (xhr.status == 200) {
-        var referenceId = xhr.responseText; // Receive reference ID from the server
-        // Show SweetAlert success message with the reference ID
-        Swal.fire({
-          title: 'Success!',
-          html: 'Your submission has been received.<br><br><b>Reference ID:</b> ' + referenceId,
-          icon: 'success',
-          confirmButtonText: 'OK'
-        }).then(function() {
-          document.getElementById("contactForm").reset(); // Reset the form after submission
-        });
-      } else {
-        // Error handling if the form submission fails
-        Swal.fire({
-          title: 'Error!',
-          text: 'There was an issue submitting your form. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
-    };
-    xhr.send(formData);
-  };
-</script>
+
           </div><!-- End Contact Form -->
         </div>
       </div>
@@ -843,5 +745,106 @@
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+	<script>
+  document.getElementById("contactForm").onsubmit = function(e) {
+    e.preventDefault(); // Prevent default form submission
+    var submitButton = document.getElementById("submitBtn");
+    var spinner = document.getElementById("spinner");
+    // Show spinner and hide the button
+    spinner.style.display = "flex";
+    submitButton.style.display = "none";
+    var formData = new FormData(this);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://script.google.com/macros/s/AKfycbwU54xzAHcZhDYi_a0nuE6GOqyjPHSTW7-EKwAPnjnP5vT3wNCUzWjF152EEPeMIdrJeA/exec", true);
+    xhr.onload = function() {
+      // Hide spinner and show the submit button after response
+      spinner.style.display = "none";
+      submitButton.style.display = "inline-block";
+      if (xhr.status == 200) {
+        var referenceId = xhr.responseText; // Receive reference ID from the server
+        // Show SweetAlert success message with the reference ID
+        Swal.fire({
+          title: 'Success!',
+          html: 'Your submission has been received.<br><br><b>Reference ID:</b> ' + referenceId,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(function() {
+          document.getElementById("contactForm").reset(); // Reset the form after submission
+        });
+      } else {
+        // Error handling if the form submission fails
+        Swal.fire({
+          title: 'Error!',
+          text: 'There was an issue submitting your form. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    };
+    xhr.send(formData);
+  };
+</script>
+	  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
+      const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
+      const range = "announcements!A2:C"; // specify the range (Sheet name and columns)
+
+      const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+
+      // Get the marquee container element
+      const marqueeContainer = document.getElementById('marqueeContainer');
+
+      // Function to pause the animation
+      function pauseMarquee() {
+        marqueeContainer.style.animationPlayState = 'paused';
+      }
+
+      // Function to resume the animation
+      function resumeMarquee() {
+        marqueeContainer.style.animationPlayState = 'running';
+      }
+
+      // Event listeners to pause and resume scrolling on focus/blur
+      marqueeContainer.addEventListener('mouseenter', pauseMarquee); // When mouse hovers over the marquee, pause
+      marqueeContainer.addEventListener('mouseleave', resumeMarquee); // When mouse leaves, resume
+
+      // Fetch data from Google Sheets and populate the marquee
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const rows = data.values;
+          const marqueeContent = document.getElementById('marqueeContent');
+
+          // Process each row of data
+          rows.forEach(row => {
+            if (row.length === 3) {  // Ensures the row has 3 columns (A, B, and C)
+              const item = document.createElement('div');
+              item.classList.add('marquee-item');
+
+              // Create individual columns with transparent background, bold text, and stretched width
+              const col1 = document.createElement('div');
+              col1.classList.add('col1');
+              col1.textContent = row[0]; // Column 1
+
+              const col2 = document.createElement('div');
+              col2.classList.add('col2');
+              col2.textContent = row[1]; // Column 2
+
+              const col3 = document.createElement('div');
+              col3.classList.add('col3');
+              col3.textContent = row[2]; // Column 3
+
+              // Append the columns to the item and then append the item to the marquee content
+              item.appendChild(col1);
+              item.appendChild(col2);
+              item.appendChild(col3);
+              marqueeContent.appendChild(item);
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching data from Google Sheets:', error));
+    });
+  </script>
 </body>
 </html>
