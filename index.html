@@ -177,7 +177,7 @@
              <div class="marquee-container" id="marqueeContainer">
     <div class="marquee-content" id="marqueeContent"></div>
   </div>
-		        <style>
+<style>
     /* Basic styles for the marquee container */
     .marquee-container {
       width: 100%;
@@ -192,13 +192,16 @@
       width: 100%;
       display: flex;
       flex-direction: column;
+      align-items: flex-start; /* Align the items to the left */
       animation: scrollUp 10s linear infinite; /* Continuous scrolling */
     }
 
     .marquee-item {
       display: flex;
+      justify-content: flex-start; /* Align the items to the left within each row */
       margin: 5px 0;
       padding: 10px;
+      width: 100%; /* Ensure full width for each item */
     }
 
     /* Column 1 - black text and stretched */
@@ -255,8 +258,8 @@
     .marquee-item:last-child {
       animation: fadeOut 10s forwards; /* Make the last item fade out */
     }
-  </style>
-  <script>
+  </style>		       
+   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
       const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
