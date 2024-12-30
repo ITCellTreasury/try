@@ -85,6 +85,85 @@
             }
         }
     </style>
+  <style>
+    /* Basic styles for the marquee container */
+    .marquee-container {
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+      position: relative;
+      background-color: transparent; /* Transparent background */
+      animation: scrollUp 10s linear infinite; /* Continuous scrolling */
+      animation-play-state: running; /* Ensure the animation is running by default */
+    }
+
+    .marquee-content {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .marquee-item {
+      display: flex;
+      margin: 5px 0;
+      padding: 10px;
+    }
+
+    /* Column 1 - black text and stretched */
+    .col1 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: left; /* Align text to the left */
+      color: black; /* Font color for the first column */
+      font-weight: bold; /* Make font bold */
+    }
+
+    /* Column 2 - blue text and stretched */
+    .col2 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: left; /* Align text to the left */
+      color: blue; /* Font color for the second column */
+      font-weight: bold; /* Make font bold */
+    }
+
+    /* Column 3 - red text and stretched */
+    .col3 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: left; /* Align text to the left */
+      color: red; /* Font color for the third column */
+      font-weight: bold; /* Make font bold */
+    }
+
+    /* Keyframes for continuous upward scroll */
+    @keyframes scrollUp {
+      0% {
+        top: 100%;
+      }
+      100% {
+        top: -100%;
+      }
+    }
+
+    /* Keyframes for fading out the last item */
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* Apply fade-out effect on the last marquee item */
+    .marquee-item:last-child {
+      animation: fadeOut 10s forwards; /* Make the last item fade out */
+    }
+  </style>
 </head>
 
 <body class="index-page">
@@ -177,84 +256,7 @@
                  <div class="marquee-container">
     <div class="marquee-content" id="marqueeContent"></div>
   </div>
-  <style>
-    /* Basic styles for the marquee container */
-    .marquee-container {
-      width: 100%;
-      height: 300px;
-      overflow: hidden;
-      position: relative;
-      background-color: transparent; /* Transparent background */
-    }
-
-    .marquee-content {
-      position: absolute;
-      animation: scrollUp 10s linear infinite; /* Continuous scrolling */
-      display: flex;
-      flex-direction: column;
-    }
-
-    .marquee-item {
-      display: flex;
-      margin: 5px 0;
-      padding: 10px;
-    }
-
-    /* Column 1 - black text and stretched */
-    .col1 {
-      flex-grow: 1; /* Stretches to fill space */
-      padding: 5px;
-      text-align: center;
-      color: black; /* Font color for the first column */
-      font-weight: bold; /* Make font bold */
-    }
-
-    /* Column 2 - blue text and stretched */
-    .col2 {
-      flex-grow: 1; /* Stretches to fill space */
-      padding: 5px;
-      text-align: center;
-      color: blue; /* Font color for the second column */
-      font-weight: bold; /* Make font bold */
-    }
-
-    /* Column 3 - red text and stretched */
-    .col3 {
-      flex-grow: 1; /* Stretches to fill space */
-      padding: 5px;
-      text-align: center;
-      color: red; /* Font color for the third column */
-      font-weight: bold; /* Make font bold */
-    }
-
-    /* Keyframes for continuous upward scroll */
-    @keyframes scrollUp {
-      0% {
-        top: 100%;
-      }
-      100% {
-        top: -100%;
-      }
-    }
-
-    /* Keyframes for fading out the last item */
-    @keyframes fadeOut {
-      0% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
-
-    /* Apply fade-out effect on the last marquee item */
-    .marquee-item:last-child {
-      animation: fadeOut 10s forwards; /* Make the last item fade out */
-    }
-  </style>
+ 
   <script>
     const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
     const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
@@ -262,6 +264,24 @@
 
     const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
+    // Get the marquee container element
+    const marqueeContainer = document.getElementById('marqueeContainer');
+
+    // Function to pause the animation
+    function pauseMarquee() {
+      marqueeContainer.style.animationPlayState = 'paused';
+    }
+
+    // Function to resume the animation
+    function resumeMarquee() {
+      marqueeContainer.style.animationPlayState = 'running';
+    }
+
+    // Event listeners to pause and resume scrolling on focus/blur
+    marqueeContainer.addEventListener('mouseenter', pauseMarquee); // When mouse hovers over the marquee, pause
+    marqueeContainer.addEventListener('mouseleave', resumeMarquee); // When mouse leaves, resume
+
+    // Fetch data from Google Sheets and populate the marquee
     fetch(apiUrl)
       .then(response => response.json())
       .then(data => {
