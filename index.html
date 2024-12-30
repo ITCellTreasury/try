@@ -173,71 +173,131 @@
           <div class="col-lg-12 aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
             <div class="faq-container">
               <div class="faq-item">
-               <marquee behavior="scroll" direction="up" scrollamount="2" width="850" height="300" behavior="alternate" vspace="2">   
- <table id="announceTable" class="myTable">
-        <thead>
-            <tr>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be populated here dynamically -->
-        </tbody>
-    </table>
-	</marquee>
-	<style>
-announceTable {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  min-width: 100%;
-}
+               
+                 <div class="marquee-container">
+    <div class="marquee-content" id="marqueeContent"></div>
+  </div>
+  <style>
+    /* Basic styles for the marquee container */
+    .marquee-container {
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+      position: relative;
+      background-color: transparent; /* Transparent background */
+    }
 
-td, th {
-  border: 1px solid #f1f1f1;
-  text-align: left;
-  padding: 10px;
-}
+    .marquee-content {
+      position: absolute;
+      animation: scrollUp 10s linear infinite; /* Continuous scrolling */
+      display: flex;
+      flex-direction: column;
+    }
 
-</style>
-    <script>
-        const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
-        const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
-        const range = "announcements!A2:C"; // Data range
+    .marquee-item {
+      display: flex;
+      margin: 5px 0;
+      padding: 10px;
+    }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            // Fetch data from Google Sheets API
-            fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
-                .then(response => response.json())
-                .then(data => {
-                    const rows = data.values;
-                    const tbody = document.querySelector("#announceTable tbody");
+    /* Column 1 - black text and stretched */
+    .col1 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: center;
+      color: black; /* Font color for the first column */
+      font-weight: bold; /* Make font bold */
+    }
 
-                    rows.forEach(row => {
-                        const tr = document.createElement("tr");
-                        row.forEach(cell => {
-                            const td = document.createElement("td");
-                            td.textContent = cell;
-                            tr.appendChild(td);
-                        });
-                        tbody.appendChild(tr);
-                    });
+    /* Column 2 - blue text and stretched */
+    .col2 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: center;
+      color: blue; /* Font color for the second column */
+      font-weight: bold; /* Make font bold */
+    }
 
-                    // Initialize DataTable after data is populated
-                    $("#announceTable").myTable();
+    /* Column 3 - red text and stretched */
+    .col3 {
+      flex-grow: 1; /* Stretches to fill space */
+      padding: 5px;
+      text-align: center;
+      color: red; /* Font color for the third column */
+      font-weight: bold; /* Make font bold */
+    }
 
-                    // Hide the preloader
-                    document.getElementById("preloader").style.display = "none";
-                })
-                .catch(error => {
-                    console.error("Error fetching data: ", error);
+    /* Keyframes for continuous upward scroll */
+    @keyframes scrollUp {
+      0% {
+        top: 100%;
+      }
+      100% {
+        top: -100%;
+      }
+    }
 
-                    // Hide the preloader in case of an error
-                    document.getElementById("preloader").style.display = "none";
-                });
+    /* Keyframes for fading out the last item */
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* Apply fade-out effect on the last marquee item */
+    .marquee-item:last-child {
+      animation: fadeOut 10s forwards; /* Make the last item fade out */
+    }
+  </style>
+  <script>
+    const sheetId = "1ioLw00le8Z9673wiITyVDaswCsXn0jYDVjnlK86gV5Q";
+    const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
+    const range = "announcements!A2:C"; // specify the range (Sheet name and columns)
+
+    const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        const rows = data.values;
+        const marqueeContent = document.getElementById('marqueeContent');
+
+        // Process each row of data
+        rows.forEach(row => {
+          if (row.length === 3) {  // Ensures the row has 3 columns (A, B, and C)
+            const item = document.createElement('div');
+            item.classList.add('marquee-item');
+
+            // Create individual columns with transparent background, bold text, and stretched width
+            const col1 = document.createElement('div');
+            col1.classList.add('col1');
+            col1.textContent = row[0]; // Column 1
+
+            const col2 = document.createElement('div');
+            col2.classList.add('col2');
+            col2.textContent = row[1]; // Column 2
+
+            const col3 = document.createElement('div');
+            col3.classList.add('col3');
+            col3.textContent = row[2]; // Column 3
+
+            // Append the columns to the item and then append the item to the marquee content
+            item.appendChild(col1);
+            item.appendChild(col2);
+            item.appendChild(col3);
+            marqueeContent.appendChild(item);
+          }
         });
-    </script>
-                
-                
+      })
+      .catch(error => console.error('Error fetching data from Google Sheets:', error));
+  </script>
+
               </div><!-- End Faq item-->
 
             </div>
