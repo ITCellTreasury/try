@@ -201,44 +201,11 @@ tfoot input {
         <div class="spinner"></div>
     </div>
  <div id="challanTableWrapper">
-    <table id="challanTable" class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>Description</th>
-                <th>Major*</th>
-                <th>Smj*</th>
-                <th>Minor*</th>
-                <th>Sub*</th>
-                <th>SubSub*</th>
-                <th>Det*</th>
-                <th>Obj*</th>
-                <th>PV/NV</th>
-            </tr>
-            <tr>
-                <!-- Input fields for column-specific search -->
-                <th><input type="text" placeholder="Search Description" /></th>
-                <th><input type="text" placeholder="Search Major" /></th>
-                <th><input type="text" placeholder="Search Smj" /></th>
-                <th><input type="text" placeholder="Search Minor" /></th>
-                <th><input type="text" placeholder="Search Sub" /></th>
-                <th><input type="text" placeholder="Search SubSub" /></th>
-                <th><input type="text" placeholder="Search Det" /></th>
-                <th><input type="text" placeholder="Search Obj" /></th>
-                <th><input type="text" placeholder="Search PV/NV" /></th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be populated here dynamically -->
-        </tbody>
-    </table>
-</div>
-
-
-<script>
+   <script>
     const sheetId = "1pMEBNm6KL71NgdqK55fIZHL67z0XJnJfTpGk7uy4Nv0";
     const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
     const range = "ID!B3:J"; // Data range
-    
+
     document.addEventListener("DOMContentLoaded", () => {
         // Fetch data from Google Sheets API
         fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
@@ -257,10 +224,10 @@ tfoot input {
                     tbody.appendChild(tr);
                 });
 
-                // Initialize DataTable with column-specific search
-               const table = $("#challanTable").DataTable({
-                responsive: true
-                  });
+                // Initialize DataTable with autoWidth enabled
+                const table = $("#challanTable").DataTable({
+                    autoWidth: true // Enable auto width adjustment
+                });
 
                 // Apply column-specific search functionality
                 $('#challanTable thead input').on('keyup change', function () {
@@ -279,6 +246,14 @@ tfoot input {
             });
     });
 </script>
+
+<style>
+    /* Ensure that the table uses dynamic width adjustment */
+    #challanTable {
+        width: 100%; /* Ensure the table takes up full width */
+        table-layout: auto; /* Allow automatic adjustment of column widths based on content */
+    }
+</style>
 
 		
       </div>
