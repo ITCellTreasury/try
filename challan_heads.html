@@ -233,7 +233,7 @@ tfoot input {
     </table>
 </div>
 
-  <script>
+ <script>
     const sheetId = "1pMEBNm6KL71NgdqK55fIZHL67z0XJnJfTpGk7uy4Nv0";
     const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
     const range = "ID!B3:J"; // Data range
@@ -256,13 +256,17 @@ tfoot input {
                     tbody.appendChild(tr);
                 });
 
-                // Initialize DataTable with specific column width for second-to-last column
+                // Initialize DataTable with column width set for the second-to-last column
                 const table = $("#challanTable").DataTable({
                     autoWidth: true, // Enable auto width adjustment
                     columnDefs: [
                         {
-                            targets: [1, 2, 3, 4, 5, 6, 7], // Columns from second to last
-                            width: '30%'  // Set width to 30%
+                            targets: [1, 2, 3, 4, 5, 6], // Target the second to last columns
+                            width: '30%'  // Set width of those columns to 30%
+                        },
+                        {
+                            targets: "_all", // Apply for other columns
+                            width: 'auto'   // Let other columns auto-size
                         }
                     ]
                 });
@@ -286,25 +290,23 @@ tfoot input {
 </script>
 
 <style>
-    /* Ensure that the table uses dynamic width adjustment */
+    /* Ensure the table uses dynamic width adjustment */
     #challanTable {
         width: 100%; /* Ensure the table takes up full width */
         table-layout: auto; /* Allow automatic adjustment of column widths based on content */
     }
 
     /* Optional: Define a width for second-to-last column */
-    #challanTable td:nth-child(2), 
-    #challanTable td:nth-child(3), 
-    #challanTable td:nth-child(4), 
+    #challanTable td:nth-child(2),
+    #challanTable td:nth-child(3),
+    #challanTable td:nth-child(4),
     #challanTable td:nth-child(5),
     #challanTable td:nth-child(6),
     #challanTable td:nth-child(7),
     #challanTable td:nth-child(8) {
         width: 30%;
     }
-</style>
-
-		
+</style>		
       </div>
 
     </section><!-- /Starter Section Section -->
