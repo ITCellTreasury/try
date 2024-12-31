@@ -200,7 +200,39 @@ tfoot input {
       <div id="preloader">
         <div class="spinner"></div>
     </div>
- <div id="challanTableWrapper">
+  <div id="challanTableWrapper">
+    <table id="challanTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Major*</th>
+                <th>Smj*</th>
+                <th>Minor*</th>
+                <th>Sub*</th>
+                <th>SubSub*</th>
+                <th>Det*</th>
+                <th>Obj*</th>
+                <th>PV/NV</th>
+            </tr>
+            <tr>
+                <!-- Input fields for column-specific search -->
+                <th><input type="text" placeholder="Search Description" /></th>
+                <th><input type="text" placeholder="Search Major" /></th>
+                <th><input type="text" placeholder="Search Smj" /></th>
+                <th><input type="text" placeholder="Search Minor" /></th>
+                <th><input type="text" placeholder="Search Sub" /></th>
+                <th><input type="text" placeholder="Search SubSub" /></th>
+                <th><input type="text" placeholder="Search Det" /></th>
+                <th><input type="text" placeholder="Search Obj" /></th>
+                <th><input type="text" placeholder="Search PV/NV" /></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here dynamically -->
+        </tbody>
+    </table>
+</div>
+
    <script>
     const sheetId = "1pMEBNm6KL71NgdqK55fIZHL67z0XJnJfTpGk7uy4Nv0";
     const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
