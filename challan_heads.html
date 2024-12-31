@@ -81,6 +81,17 @@
                 transform: rotate(360deg);
             }
         }
+	#challanTableWrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table#challanTable {
+    width: 100%;
+    table-layout: fixed;
+}
+
     </style>
 </head>
 
@@ -180,42 +191,45 @@
       <div id="preloader">
         <div class="spinner"></div>
     </div>
-  <table id="challanTable" class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>Description</th>
-            <th>Major*</th>
-            <th>Smj*</th>
-            <th>Minor*</th>
-            <th>Sub*</th>
-            <th>SubSub*</th>
-            <th>Det*</th>
-            <th>Obj*</th>
-            <th>PV/NV</th>
-        </tr>
-        <tr>
-            <!-- Input fields for column-specific search -->
-            <th><input type="text" placeholder="Search Description" /></th>
-            <th><input type="text" placeholder="Search Major" /></th>
-            <th><input type="text" placeholder="Search Smj" /></th>
-            <th><input type="text" placeholder="Search Minor" /></th>
-            <th><input type="text" placeholder="Search Sub" /></th>
-            <th><input type="text" placeholder="Search SubSub" /></th>
-            <th><input type="text" placeholder="Search Det" /></th>
-            <th><input type="text" placeholder="Search Obj" /></th>
-            <th><input type="text" placeholder="Search PV/NV" /></th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Data will be populated here dynamically -->
-    </tbody>
-</table>
+ <div id="challanTableWrapper">
+    <table id="challanTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Major*</th>
+                <th>Smj*</th>
+                <th>Minor*</th>
+                <th>Sub*</th>
+                <th>SubSub*</th>
+                <th>Det*</th>
+                <th>Obj*</th>
+                <th>PV/NV</th>
+            </tr>
+            <tr>
+                <!-- Input fields for column-specific search -->
+                <th><input type="text" placeholder="Search Description" /></th>
+                <th><input type="text" placeholder="Search Major" /></th>
+                <th><input type="text" placeholder="Search Smj" /></th>
+                <th><input type="text" placeholder="Search Minor" /></th>
+                <th><input type="text" placeholder="Search Sub" /></th>
+                <th><input type="text" placeholder="Search SubSub" /></th>
+                <th><input type="text" placeholder="Search Det" /></th>
+                <th><input type="text" placeholder="Search Obj" /></th>
+                <th><input type="text" placeholder="Search PV/NV" /></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be populated here dynamically -->
+        </tbody>
+    </table>
+</div>
+
 
 <script>
     const sheetId = "1pMEBNm6KL71NgdqK55fIZHL67z0XJnJfTpGk7uy4Nv0";
     const apiKey = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
     const range = "ID!B3:J"; // Data range
-
+    
     document.addEventListener("DOMContentLoaded", () => {
         // Fetch data from Google Sheets API
         fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
@@ -235,7 +249,9 @@
                 });
 
                 // Initialize DataTable with column-specific search
-                const table = $("#challanTable").DataTable();
+               const table = $("#challanTable").DataTable({
+                responsive: true
+                  });
 
                 // Apply column-specific search functionality
                 $('#challanTable thead input').on('keyup change', function () {
@@ -265,17 +281,7 @@
     <div class="footer-newsletter">
       <div class="container">
         <div class="row justify-content-center text-center">
-		<!--
-          <div class="col-lg-6">
-            <h4>Join Our Newsletter</h4>
-            <p>Subscribe to our newsletter and receive the latest news about our products and services!</p>
-            <form action="forms/newsletter.php" method="post" class="php-email-form">
-              <div class="newsletter-form"><input type="email" name="email"><input type="submit" value="Subscribe"></div>
-              <div class="loading">Loading</div>
-              <div class="error-message"></div>
-              <div class="sent-message">Your subscription request has been sent. Thank you!</div>
-            </form>
-          </div> -->
+		
         </div>
       </div>
     </div>
