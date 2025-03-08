@@ -192,7 +192,7 @@ function updateResultHeading(officeName, totalBills, totalGrossAmount) {
         });
 
         $('#grandTotal').text(totalGrossAmount.toFixed(2));
-		$('#billCount').text(`(${data.length} bills found)`);
+	$('#billCount').text(`(${data.length} bills found)`);
 
         if (data.length === 0) {
             Swal.fire('No Records Found', 'No matching records found for the selected criteria.', 'info');
