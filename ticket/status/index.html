@@ -16,7 +16,6 @@
             border-radius: 10px;
             padding: 30px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            max-width: 1000px;
             margin: 0 auto;
         }
         .status-title {
@@ -68,11 +67,29 @@
             font-size: 0.9rem;
             color: #6c757d;
         }
+        .date-filter {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .current-date-badge {
+            font-size: 1rem;
+            padding: 8px 15px;
+            background-color: #072a8f;
+            color: white;
+           
+        }
     </style>
 </head>
 <body>
     <div class="status-container">
         <h2 class="status-title">Visitor Queue Status</h2>
+        
+        <div class="date-filter">
+            <span class="current-date-badge" id="currentDateBadge"></span>
+        </div>
         
         <table class="queue-table">
             <thead>
@@ -83,18 +100,23 @@
                     <th>Que 3</th>
                     <th>Que 4</th>
                     <th>Que 5</th>
+                    <th>Que 6</th>
+                    <th>Que 7</th>
+                    <th>Que 8</th>
+                    <th>Que 9</th>
+                    <th>Que 10</th>
                 </tr>
             </thead>
             <tbody id="queueBody">
                 <!-- Data will be loaded here -->
                 <tr>
-                    <td colspan="6" class="text-center">Loading queue status...</td>
+                    <td colspan="11" class="text-center">Loading queue status...</td>
                 </tr>
             </tbody>
         </table>
         
         <div class="refresh-info">
-            Last updated: <span id="lastUpdated">Never</span> | Auto-refreshing every minutes
+            Last updated: <span id="lastUpdated">Never</span> | Auto-refreshing every minute
         </div>
     </div>
 
@@ -112,6 +134,24 @@
             'bg-warning', 'bg-danger', 'bg-secondary'
         ];
         
+        // Format date as DD/MM/YYYY
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        // Get current date in DD/MM/YYYY format
+        function getCurrentDate() {
+            return formatDate(new Date());
+        }
+        
+        // Update current date badge
+        function updateCurrentDateBadge() {
+            $('#currentDateBadge').text(`Showing visitors for: ${getCurrentDate()}`);
+        }
+        
         // Load queue data
         function loadQueueData() {
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}!${range}?key=${apiKey}`;
@@ -121,11 +161,11 @@
                     processQueueData(data.values);
                     updateTimestamp();
                 } else {
-                    $('#queueBody').html('<tr><td colspan="6" class="text-center">No queue data found</td></tr>');
+                    $('#queueBody').html('<tr><td colspan="11" class="text-center">No queue data found</td></tr>');
                 }
             }).fail(function(error) {
                 console.error('Error loading queue data:', error);
-                $('#queueBody').html('<tr><td colspan="6" class="text-center">Error loading queue data</td></tr>');
+                $('#queueBody').html('<tr><td colspan="11" class="text-center">Error loading queue data</td></tr>');
             });
         }
         
@@ -134,19 +174,30 @@
             const headers = rows[0];
             const data = rows.slice(1);
             
-            // Get all unique sections
+            // Get column indices
             const sectionColIndex = headers.indexOf('Office Section');
             const ticketColIndex = headers.indexOf('Ticket No');
             const nameColIndex = headers.indexOf('Visitor Name');
+            const dateColIndex = headers.indexOf('Date Opt for Visit');
             const statusColIndex = headers.indexOf('Status') !== -1 ? headers.indexOf('Status') : null;
             
-            const sections = [...new Set(data.map(row => row[sectionColIndex]))].filter(Boolean);
+            // Get current date for filtering
+            const currentDate = getCurrentDate();
+            
+            // Filter data for current date
+            const todayData = data.filter(row => {
+                const rowDate = row[dateColIndex];
+                return rowDate && rowDate.trim() === currentDate;
+            });
+            
+            // Get all unique sections from today's data
+            const sections = [...new Set(todayData.map(row => row[sectionColIndex]))].filter(Boolean);
             
             // Group tickets by section
             const sectionTickets = {};
             sections.forEach(section => {
                 // Get all tickets for this section (excluding closed ones if status column exists)
-                let tickets = data.filter(row => row[sectionColIndex] === section);
+                let tickets = todayData.filter(row => row[sectionColIndex] === section);
                 
                 if (statusColIndex !== null) {
                     tickets = tickets.filter(row => !row[statusColIndex] || !row[statusColIndex].includes('Closed'));
@@ -158,7 +209,7 @@
                     return a[ticketColIndex]?.localeCompare(b[ticketColIndex]) || 0;
                 });
                 
-                sectionTickets[section] = tickets.slice(0, 5); // Get first 5 tickets
+                sectionTickets[section] = tickets.slice(0, 10); // Get first 10 tickets
             });
             
             // Update table
@@ -166,7 +217,7 @@
             tableBody.empty();
             
             if (sections.length === 0) {
-                tableBody.append('<tr><td colspan="6" class="text-center">No active sections found</td></tr>');
+                tableBody.append('<tr><td colspan="11" class="text-center">No visitors for today</td></tr>');
                 return;
             }
             
@@ -179,8 +230,8 @@
                 // Section column with pill badge
                 row.append(`<td><span class="section-badge badge ${badgeClass}">${section}</span></td>`);
                 
-                // Queue columns (1-5)
-                for (let i = 0; i < 5; i++) {
+                // Queue columns (1-10)
+                for (let i = 0; i < 10; i++) {
                     if (tickets[i]) {
                         row.append(`
                             <td>
@@ -205,9 +256,10 @@
         }
         
         // Initial load
+        updateCurrentDateBadge();
         loadQueueData();
         
-        // Auto-refresh every  minutes (60000 ms)
+        // Auto-refresh every minute (60000 ms)
         setInterval(loadQueueData, 60000);
     </script>
 </body>
