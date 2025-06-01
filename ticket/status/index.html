@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Queue Status</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .status-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .status-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        .section-badge {
+            font-size: 1rem;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .queue-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        .queue-table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .queue-table td {
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .queue-table tr:first-child td {
+            border-top: 1px solid #dee2e6;
+        }
+        .ticket-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            margin-bottom: 5px;
+        }
+        .visitor-name {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .refresh-info {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-container">
+        <h2 class="status-title">Visitor Queue Status</h2>
+        
+        <table class="queue-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Office Section</th>
+                    <th>Que 1</th>
+                    <th>Que 2</th>
+                    <th>Que 3</th>
+                    <th>Que 4</th>
+                    <th>Que 5</th>
+                </tr>
+            </thead>
+            <tbody id="queueBody">
+                <!-- Data will be loaded here -->
+                <tr>
+                    <td colspan="6" class="text-center">Loading queue status...</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="refresh-info">
+            Last updated: <span id="lastUpdated">Never</span> | Auto-refreshing every minutes
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Google Sheets API configuration
+        const sheetId = '1wTGegdA23bbudI4ujK1C-znVSEisuRGL2etgHPj7ZZc';
+        const apiKey = 'AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4';
+        const sheetName = 'Data';
+        const range = 'A1:M'; // Adjust if needed
+        
+        // Color classes for section badges
+        const badgeClasses = [
+            'bg-primary', 'bg-success', 'bg-info', 
+            'bg-warning', 'bg-danger', 'bg-secondary'
+        ];
+        
+        // Load queue data
+        function loadQueueData() {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}!${range}?key=${apiKey}`;
+            
+            $.get(url, function(data) {
+                if (data.values && data.values.length > 1) {
+                    processQueueData(data.values);
+                    updateTimestamp();
+                } else {
+                    $('#queueBody').html('<tr><td colspan="6" class="text-center">No queue data found</td></tr>');
+                }
+            }).fail(function(error) {
+                console.error('Error loading queue data:', error);
+                $('#queueBody').html('<tr><td colspan="6" class="text-center">Error loading queue data</td></tr>');
+            });
+        }
+        
+        // Process queue data and update table
+        function processQueueData(rows) {
+            const headers = rows[0];
+            const data = rows.slice(1);
+            
+            // Get all unique sections
+            const sectionColIndex = headers.indexOf('Office Section');
+            const ticketColIndex = headers.indexOf('Ticket No');
+            const nameColIndex = headers.indexOf('Visitor Name');
+            const statusColIndex = headers.indexOf('Status') !== -1 ? headers.indexOf('Status') : null;
+            
+            const sections = [...new Set(data.map(row => row[sectionColIndex]))].filter(Boolean);
+            
+            // Group tickets by section
+            const sectionTickets = {};
+            sections.forEach(section => {
+                // Get all tickets for this section (excluding closed ones if status column exists)
+                let tickets = data.filter(row => row[sectionColIndex] === section);
+                
+                if (statusColIndex !== null) {
+                    tickets = tickets.filter(row => !row[statusColIndex] || !row[statusColIndex].includes('Closed'));
+                }
+                
+                // Sort by some criteria (e.g., by ticket number or timestamp)
+                tickets.sort((a, b) => {
+                    // Simple sort by ticket number (you may want to sort by time instead)
+                    return a[ticketColIndex]?.localeCompare(b[ticketColIndex]) || 0;
+                });
+                
+                sectionTickets[section] = tickets.slice(0, 5); // Get first 5 tickets
+            });
+            
+            // Update table
+            const tableBody = $('#queueBody');
+            tableBody.empty();
+            
+            if (sections.length === 0) {
+                tableBody.append('<tr><td colspan="6" class="text-center">No active sections found</td></tr>');
+                return;
+            }
+            
+            sections.forEach((section, index) => {
+                const tickets = sectionTickets[section] || [];
+                const badgeClass = badgeClasses[index % badgeClasses.length];
+                
+                const row = $('<tr>');
+                
+                // Section column with pill badge
+                row.append(`<td><span class="section-badge badge ${badgeClass}">${section}</span></td>`);
+                
+                // Queue columns (1-5)
+                for (let i = 0; i < 5; i++) {
+                    if (tickets[i]) {
+                        row.append(`
+                            <td>
+                                <div class="ticket-badge">${tickets[i][ticketColIndex] || 'N/A'}</div>
+                                <div class="visitor-name">${tickets[i][nameColIndex] || ''}</div>
+                            </td>
+                        `);
+                    } else {
+                        row.append('<td>-</td>');
+                    }
+                }
+                
+                tableBody.append(row);
+            });
+        }
+        
+        // Update last updated timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            $('#lastUpdated').text(timeString);
+        }
+        
+        // Initial load
+        loadQueueData();
+        
+        // Auto-refresh every  minutes (60000 ms)
+        setInterval(loadQueueData, 60000);
+    </script>
+</body>
+</html>
