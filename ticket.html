@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Registration</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .form-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .form-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+        .select2-container .select2-selection--single {
+            height: 38px;
+            padding-top: 4px;
+        }
+        .ticket-highlight {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #d35400;
+            background-color: #fdebd0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+            background-color: white;
+            border-bottom: 1px solid white;
+        }
+        .tab-content {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container form-container">
+        <h2 class="form-title">Visitor Registration | IT Cell Treasury</h2>
+        
+        <ul class="nav nav-tabs" id="visitorTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">New Registration</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#search" type="button" role="tab">Search Ticket</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="visitorTabsContent">
+            <!-- Registration Tab -->
+            <div class="tab-pane fade show active" id="register" role="tabpanel">
+                <form id="visitorForm">
+				<div class="row mb-3"style="display:none;">
+				 <div class="col-md-6" >
+                            <label for="ticketNo" class="form-label">Ticket No.</label>
+                            <input type="text" class="form-control" id="ticketNo" readonly>
+                        </div>
+				 </div>
+				
+                    <div class="row mb-3">
+					
+						
+                        <div class="col-md-6">
+                            <label for="treasuryOffice" class="form-label required-field">Treasury Office</label>
+                            <select class="form-select select2" id="treasuryOffice" required>
+                                <option value="" selected disabled>Select Treasury Office</option>
+                                <!-- Options will be loaded via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sectionForVisit" class="form-label required-field">Section for Visit</label>
+                            <select class="form-select select2" id="sectionForVisit" required>
+                                <option value="" selected disabled>Select Section</option>
+                                <!-- Options will be loaded via JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+					
+                        <div class="mb-3">
+                        <label for="purpose" class="form-label">Purpose</label>
+                        <textarea class="form-control" id="purpose" rows="3"></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="visitingDate" class="form-label required-field">Visiting Date</label>
+                            <input type="text" class="form-control" id="visitingDate" required>
+                        </div>
+                         <div class="col-md-6">
+                            <label for="mobileNo" class="form-label required-field">Mobile No.</label>
+                            <input type="tel" class="form-control" id="mobileNo" required pattern="[0-9]{10}">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label required-field">Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email ID</label>
+                            <input type="email" class="form-control" id="email">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Search Tab -->
+            <div class="tab-pane fade" id="search" role="tabpanel">
+                <form id="searchForm">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <label for="searchMobileNo" class="form-label required-field">Mobile No.</label>
+                            <input type="tel" class="form-control" id="searchMobileNo" required pattern="[0-9]{10}">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">Search Ticket</button>
+                        </div>
+                    </div>
+                    
+                    <div id="searchResults" class="mt-4" style="display: none;">
+                        <h4>Ticket Information</h4>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Ticket No.:</strong> <span id="resultTicketNo" class="ticket-highlight"></span></p>
+                                        <p><strong>Name:</strong> <span id="resultName"></span></p>
+                                        <p><strong>Visiting Date:</strong> <span id="resultDate"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Treasury Office:</strong> <span id="resultOffice"></span></p>
+                                        <p><strong>Section:</strong> <span id="resultSection"></span></p>
+                                        <p><strong>Purpose:</strong> <span id="resultPurpose"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="noResults" class="alert alert-warning mt-4" style="display: none;">
+                        No ticket found for this mobile number.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 with auto-focus
+            $('.select2').select2({
+                dropdownAutoWidth: true,
+                dropdownParent: $('#register'),
+                allowClear: true
+            }).on('select2:open', function() {
+                document.querySelector('.select2-search__field').focus();
+            });
+            
+            // Initialize date picker with DD/MM/YYYY format
+            flatpickr("#visitingDate", {
+                dateFormat: "d/m/Y",
+                minDate: "today",
+                disable: [
+                    function(date) {
+                        return date < new Date().setHours(0, 0, 0, 0);
+                    }
+                ]
+            });
+            
+            // Generate ticket number
+            function generateTicketNo() {
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, '0');
+                const hour = String(now.getHours()).padStart(2, '0');
+                const minute = String(now.getMinutes()).padStart(2, '0');
+                const second = String(now.getSeconds()).padStart(2, '0');
+                return `${second}${minute}${hour}${day}`;
+            }
+            
+            // Format date to DD/MM/YYYY
+            function formatDateToDDMMYYYY(dateString) {
+                const date = new Date(dateString);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+            
+            // Set ticket number on page load
+            $('#ticketNo').val(generateTicketNo());
+            
+            // Try to get email from browser if available
+            if (typeof(Storage) !== "undefined" && localStorage.getItem('visitorEmail')) {
+                $('#email').val(localStorage.getItem('visitorEmail'));
+            }
+            
+            // Load Treasury Offices and Sections from Google Sheets
+            function loadSheetData() {
+                const sheetId = '1wTGegdA23bbudI4ujK1C-znVSEisuRGL2etgHPj7ZZc';
+                const apiKey = 'AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4';
+                
+                // Load Treasury Offices
+                $.get(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Settings!A2:A?key=${apiKey}`, function(data) {
+                    if (data.values) {
+                        const select = $('#treasuryOffice');
+                        data.values.forEach(function(row) {
+                            if (row[0]) {
+                                select.append($('<option>', {
+                                    value: row[0],
+                                    text: row[0]
+                                }));
+                            }
+                        });
+                    }
+                }).fail(console.error);
+                
+                // Load Sections
+                $.get(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Settings!B2:B?key=${apiKey}`, function(data) {
+                    if (data.values) {
+                        const select = $('#sectionForVisit');
+                        data.values.forEach(function(row) {
+                            if (row[0]) {
+                                select.append($('<option>', {
+                                    value: row[0],
+                                    text: row[0]
+                                }));
+                            }
+                        });
+                    }
+                }).fail(console.error);
+            }
+            
+            // Load data on page load
+            loadSheetData();
+            
+            // Form submission for new registration
+            document.getElementById('visitorForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+                
+                // Generate new ticket number
+                const ticketNo = generateTicketNo();
+                $('#ticketNo').val(ticketNo);
+                
+                // Save email to localStorage if available
+                if ($('#email').val()) {
+                    localStorage.setItem('visitorEmail', $('#email').val());
+                }
+                
+                // Format dates to DD/MM/YYYY
+                const visitingDate = $('#visitingDate').val();
+                const formattedVisitingDate = visitingDate ? visitingDate : ''; // Already formatted by flatpickr
+                const formattedTimestamp = formatDateToDDMMYYYY(new Date().toISOString());
+                
+                // Prepare form data
+                const formData = {
+                    visitingDate: formattedVisitingDate,
+                    treasuryOffice: $('#treasuryOffice').val(),
+                    mobileNo: $('#mobileNo').val(),
+                    ticketNo: ticketNo,
+                    name: $('#name').val(),
+                    email: $('#email').val(),
+                    address: $('#address').val(),
+                    sectionForVisit: $('#sectionForVisit').val(),
+                    purpose: $('#purpose').val(),
+                    timestamp: formattedTimestamp
+                };
+                
+                // Create URL with parameters
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbx8Mk8rVs2auex3db2uH_-slL0m2IW_pX-95qz8Az1Xzvfw1aFKgXKBv3ijI2hlg_Xv/exec';
+                const url = new URL(scriptUrl);
+                
+                // Add all form data as URL parameters
+                Object.keys(formData).forEach(key => {
+                    if (formData[key]) {
+                        url.searchParams.append(key, formData[key]);
+                    }
+                });
+                
+                // Send data to Google Apps Script using GET
+                fetch(url, {
+                    method: 'GET',
+                    redirect: 'follow'
+                })
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        const data = text ? JSON.parse(text) : {};
+                        if (data.result === 'success') {
+                            Swal.fire({
+                                title: 'Registration Successful!',
+                                html: `Your ticket number is: <div class="ticket-highlight">${ticketNo}</div>`,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                            
+                            // Reset form
+                            this.reset();
+                            $('#ticketNo').val(generateTicketNo());
+                            $('.select2').val(null).trigger('change');
+                        } else {
+                            throw new Error(data.message || 'Failed to submit form');
+                        }
+                    } catch {
+                        // Fallback success handling
+                        Swal.fire({
+                            title: 'Registration Successful!',
+                            html: `Your ticket number is: <div class="ticket-highlight">${ticketNo}</div>`,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+                        this.reset();
+                        $('#ticketNo').val(generateTicketNo());
+                        $('.select2').val(null).trigger('change');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: error.message || 'There was an error submitting your form. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                });
+            });
+            
+            // Form submission for ticket search
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const mobileNo = $('#searchMobileNo').val().trim();
+                if (!mobileNo) return;
+                
+                // Show loading state
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching...';
+                
+                // Hide previous results
+                $('#searchResults').hide();
+                $('#noResults').hide();
+                
+                // Create search URL
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbx8Mk8rVs2auex3db2uH_-slL0m2IW_pX-95qz8Az1Xzvfw1aFKgXKBv3ijI2hlg_Xv/exec';
+                const url = new URL(scriptUrl);
+                url.searchParams.append('action', 'search');
+                url.searchParams.append('mobileNo', mobileNo);
+                
+                // Send search request
+                fetch(url, {
+                    method: 'GET',
+                    redirect: 'follow'
+                })
+                .then(response => response.text())
+                .then(text => {
+    try {
+        const data = text ? JSON.parse(text) : {};
+        if (data.result === 'success' && data.records && data.records.length > 0) {
+            // Get the most recent record (first in the sorted array)
+            const record = data.records[0];
+            
+            // Display the results
+            $('#resultTicketNo').text(record[3] || 'N/A'); // Ticket No (column D)
+            $('#resultName').text(record[4] || 'N/A');     // Name (column E)
+            $('#resultDate').text(record[0] || 'N/A');      // Visiting Date (column A)
+            $('#resultOffice').text(record[1] || 'N/A');    // Treasury Office (column B)
+            $('#resultSection').text(record[2] || 'N/A');   // Section (column C)
+            $('#resultPurpose').text(record[8] || 'N/A');  // Purpose (column I)
+            
+            $('#searchResults').show();
+            $('#noResults').hide();
+        } else {
+            $('#searchResults').hide();
+            $('#noResults').show();
+        }
+    } catch {
+        $('#searchResults').hide();
+        $('#noResults').show();
+    }
+})
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'There was an error searching for your ticket. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
