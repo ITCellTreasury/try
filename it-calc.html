@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Tax Calculator </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            display: none;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #eee;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0 0 4px 4px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .password-prompt {
+            display: none;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .input-table th, .input-table td {
+            padding: 10px;
+        }
+        .input-table input {
+            width: 90%;
+        }
+        .print-only {
+            display: none;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            .print-only {
+                display: block;
+            }
+            body {
+                padding: 0;
+                font-size: 12px;
+            }
+            .result {
+                display: block !important;
+                background-color: transparent;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Income Tax Calculator</h1>
+    
+    <div class="tabs no-print">
+        <div class="tab active" onclick="openTab('calculator')">Tax Calculator</div>
+        <div class="tab" onclick="openSlabTab()">Tax Slabs</div>
+    </div>
+    
+    <div id="calculator" class="tab-content active">
+        <form id="taxForm">
+            <div class="form-container">
+                <div>
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" oninput="this.value = this.value.toUpperCase()" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pan">PAN Number:</label>
+                        <input type="text" id="pan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" 
+                               oninput="this.value = this.value.toUpperCase()" 
+                               title="Enter valid PAN (Format: ABCDE1234F)" required>
+                        <div id="panError" class="error"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dob">Date of Birth:</label>
+                        <input type="date" id="dob" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="form-group">
+                        <label for="grossIncome">Gross Income (₹):</label>
+                        <input type="number" id="grossIncome" min="0" value="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="financialYear">Financial Year:</label>
+                        <input type="text" id="financialYear" value="2025-26" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Age Category:</label>
+                        <input type="text" id="ageCategory" readonly>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Deductions</h2>
+            <table class="input-table">
+                <thead>
+                    <tr>
+                        <th>Section</th>
+                        <th>Description</th>
+                        <th>Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>80C</td>
+                        <td>Investments (Max ₹1,50,000)</td>
+                        <td><input type="number" id="deduction80C" min="0" max="150000" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>80D</td>
+                        <td>Medical Insurance</td>
+                        <td><input type="number" id="deduction80D" min="0" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>80G</td>
+                        <td>Donations</td>
+                        <td><input type="number" id="deduction80G" min="0" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>80E</td>
+                        <td>Education Loan Interest</td>
+                        <td><input type="number" id="deduction80E" min="0" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>80TTA</td>
+                        <td>Savings Account Interest (Max ₹10,000)</td>
+                        <td><input type="number" id="deduction80TTA" min="0" max="10000" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td>Standard Deduction</td>
+                        <td>Standard Deduction</td>
+                        <td><input type="number" id="standardDeduction" min="0" value="75000" ></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="no-print" style="margin-top: 20px;">
+                <button type="button" onclick="calculateTax()">Calculate Tax</button>
+                <button type="button" onclick="resetForm()">Reset</button>
+                <button type="button" id="printBtn" style="display:none;" onclick="window.print()">Print</button>
+            </div>
+        </form>
+        
+        <div id="result" class="result">
+            <h2>Tax Calculation Results</h2>
+            <table>
+                <tr>
+                    <th>Name:</th>
+                    <td colspan="3"><span id="resultName"></span></td>
+                </tr>
+                <tr>
+                    <th>PAN:</th>
+                    <td colspan="3"><span id="resultPAN"></span></td>
+                </tr>
+                <tr>
+                    <th>Date of Birth (MM/DD/YYYY):</th>
+                    <td><span id="resultDOB"></span></td>
+                    <th>Age Category:</th>
+                    <td><span id="resultAgeCategory"></span></td>
+                </tr>
+                <tr>
+                    <th>Financial Year:</th>
+                    <td colspan="3">2025-26</td>
+                </tr>
+                <tr>
+                    <th>Total Income:</th>
+                    <td colspan="3">₹<span id="totalIncome"></span></td>
+                </tr>
+                <tr>
+                    <th>Total Deductions:</th>
+                    <td colspan="3">₹<span id="totalDeductions"></span></td>
+                </tr>
+                <tr>
+                    <th>Taxable Income:</th>
+                    <td colspan="3">₹<span id="taxableIncome"></span></td>
+                </tr>
+                <tr>
+                    <th>Income Tax:</th>
+                    <td colspan="3">₹<span id="incomeTax"></span></td>
+                </tr>
+                <tr>
+                    <th>Health & Education Cess (4%):</th>
+                    <td colspan="3">₹<span id="cess"></span></td>
+                </tr>
+                <tr>
+                    <th>Total Tax Liability:</th>
+                    <td colspan="3">₹<span id="totalTax"></span></td>
+                </tr>
+            </table>
+            
+            <div class="print-only">
+                <p>Printed on: <span id="printDate"></span></p>
+                <p>This is a computer generated document and doesn't require signature.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="slabs" class="tab-content">
+        <div id="passwordPrompt" class="password-prompt">
+            <div class="form-group">
+                <label for="password">Enter Password to View Tax Slabs:</label>
+                <input type="password" id="password">
+                <button type="button" onclick="checkPassword()">Submit</button>
+                <div id="passwordError" class="error"></div>
+            </div>
+        </div>
+        
+        <div id="slabContent" style="display:none;">
+            <h2>Income Tax Slabs for FY 2025-26 (AY 2026-27)</h2>
+            
+            <h3>For Individuals & HUF (Below 60 years)</h3>
+            <table id="generalSlab">
+                <tr>
+                    <th>Income Range From (₹)</th>
+                    <th>Income Upto (₹)</th>
+                    <th>Tax Rate</th>
+                </tr>
+            </table>
+            
+            <h3>For Senior Citizens (60-80 years)</h3>
+            <table id="seniorSlab">
+                <tr>
+                    <th>Income Range From (₹)</th>
+                    <th>Income Upto (₹)</th>
+                    <th>Tax Rate</th>
+                </tr>
+            </table>
+            
+            <h3>For Super Senior Citizens (Above 80 years)</h3>
+            <table id="superSeniorSlab">
+                <tr>
+                    <th>Income Range From (₹)</th>
+                    <th>Income Upto (₹)</th>
+                    <th>Tax Rate</th>
+                </tr>
+            </table>
+            
+            <h3>Surcharge</h3>
+            <ul>
+                <li>10% of income tax if total income exceeds ₹50 lakhs</li>
+                <li>15% of income tax if total income exceeds ₹1 crore</li>
+                <li>25% of income tax if total income exceeds ₹2 crore</li>
+                <li>37% of income tax if total income exceeds ₹5 crore</li>
+            </ul>
+            
+            <h3>Health & Education Cess</h3>
+            <p>4% on income tax plus surcharge (if applicable)</p>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables to store tax slabs
+        let generalSlabs = [];
+        let seniorSlabs = [];
+        let superSeniorSlabs = [];
+        
+        // Google Sheets API configuration
+        const SPREADSHEET_ID = "1efRZAGEG0FZ_ZCGBx-cQ3oBbpcUFl0sVNrsvH6ErFxs";
+        const API_KEY = "AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4";
+        
+        // Function to round up to nearest integer
+        function roundUp(value) {
+            return Math.ceil(value);
+        }
+        
+        // Fetch tax slabs from Google Sheets
+        async function fetchTaxSlabs() {
+            try {
+                // Fetch General Slabs (A5:C10)
+                const generalResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/A5:C10?key=${API_KEY}`);
+                const generalData = await generalResponse.json();
+                generalSlabs = processSlabData(generalData.values || []);
+                populateSlabTable('generalSlab', generalSlabs);
+                
+                // Fetch Senior Citizen Slabs (E5:G10)
+                const seniorResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/E5:G10?key=${API_KEY}`);
+                const seniorData = await seniorResponse.json();
+                seniorSlabs = processSlabData(seniorData.values || []);
+                populateSlabTable('seniorSlab', seniorSlabs);
+                
+                // Fetch Super Senior Citizen Slabs (I5:K10)
+                const superSeniorResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/I5:K10?key=${API_KEY}`);
+                const superSeniorData = await superSeniorResponse.json();
+                superSeniorSlabs = processSlabData(superSeniorData.values || []);
+                populateSlabTable('superSeniorSlab', superSeniorSlabs);
+                
+            } catch (error) {
+                console.error("Error fetching tax slabs:", error);
+                // Fallback to hardcoded slabs if API fails
+                loadDefaultSlabs();
+            }
+        }
+        
+        function processSlabData(data) {
+            return data.map(row => ({
+                from: parseFloat(row[0]) || 0,
+                to: row[1] === "" ? Infinity : parseFloat(row[1]),
+                rate: parseFloat(row[2]) || 0
+            }));
+        }
+        
+        function populateSlabTable(tableId, slabs) {
+            const table = document.getElementById(tableId);
+            // Clear existing rows except header
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+            
+            slabs.forEach(slab => {
+                const row = table.insertRow();
+                row.insertCell(0).textContent = slab.from.toLocaleString('en-IN');
+                row.insertCell(1).textContent = slab.to === Infinity ? "Above" : slab.to.toLocaleString('en-IN');
+                row.insertCell(2).textContent = slab.rate === 0 ? "Nil" : `${slab.rate}%`;
+            });
+        }
+        
+        function loadDefaultSlabs() {
+            generalSlabs = [
+                { from: 0, to: 300000, rate: 0 },
+                { from: 300001, to: 600000, rate: 5 },
+                { from: 600001, to: 900000, rate: 10 },
+                { from: 900001, to: 1200000, rate: 15 },
+                { from: 1200001, to: 1500000, rate: 20 },
+                { from: 1500001, to: Infinity, rate: 30 }
+            ];
+            
+            seniorSlabs = [
+                { from: 0, to: 350000, rate: 0 },
+                { from: 350001, to: 600000, rate: 5 },
+                { from: 600001, to: 900000, rate: 10 },
+                { from: 900001, to: 1200000, rate: 15 },
+                { from: 1200001, to: 1500000, rate: 20 },
+                { from: 1500001, to: Infinity, rate: 30 }
+            ];
+            
+            superSeniorSlabs = [
+                { from: 0, to: 500000, rate: 0 },
+                { from: 500001, to: 600000, rate: 5 },
+                { from: 600001, to: 900000, rate: 10 },
+                { from: 900001, to: 1200000, rate: 15 },
+                { from: 1200001, to: 1500000, rate: 20 },
+                { from: 1500001, to: Infinity, rate: 30 }
+            ];
+            
+            populateSlabTable('generalSlab', generalSlabs);
+            populateSlabTable('seniorSlab', seniorSlabs);
+            populateSlabTable('superSeniorSlab', superSeniorSlabs);
+        }
+        
+        function openTab(tabName) {
+            const tabs = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            const tabButtons = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        function openSlabTab() {
+            openTab('slabs');
+            document.getElementById('passwordPrompt').style.display = 'block';
+            document.getElementById('slabContent').style.display = 'none';
+        }
+        
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            if (password === "isms@0101") {
+                document.getElementById('passwordPrompt').style.display = 'none';
+                document.getElementById('slabContent').style.display = 'block';
+                document.getElementById('passwordError').textContent = '';
+            } else {
+                document.getElementById('passwordError').textContent = 'Incorrect password. Please try again.';
+            }
+        }
+        
+        function validatePAN() {
+            const pan = document.getElementById('pan').value;
+            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            const errorElement = document.getElementById('panError');
+            
+            if (!panRegex.test(pan)) {
+                errorElement.textContent = 'Please enter a valid PAN (Format: ABCDE1234F)';
+                return false;
+            } else {
+                errorElement.textContent = '';
+                return true;
+            }
+        }
+        
+        function calculateAgeCategory(dob) {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            if (age >= 80) {
+                return "Super Senior Citizen (Above 80 years)";
+            } else if (age >= 60) {
+                return "Senior Citizen (60-80 years)";
+            } else {
+                return "General (Below 60 years)";
+            }
+        }
+        
+        function calculateTax() {
+            if (!validatePAN()) {
+                return;
+            }
+            
+            // Get input values
+            const name = document.getElementById('name').value;
+            const pan = document.getElementById('pan').value;
+            const dob = document.getElementById('dob').value;
+            const grossIncome = parseFloat(document.getElementById('grossIncome').value) || 0;
+            
+            // Calculate age category
+            const ageCategory = calculateAgeCategory(dob);
+            document.getElementById('ageCategory').value = ageCategory;
+            
+            // Get deductions
+            const deduction80C = Math.min(parseFloat(document.getElementById('deduction80C').value) || 0, 150000);
+            const deduction80D = parseFloat(document.getElementById('deduction80D').value) || 0;
+            const deduction80G = parseFloat(document.getElementById('deduction80G').value) || 0;
+            const deduction80E = parseFloat(document.getElementById('deduction80E').value) || 0;
+            const deduction80TTA = Math.min(parseFloat(document.getElementById('deduction80TTA').value) || 0, 10000);
+            const standardDeduction = parseFloat(document.getElementById('standardDeduction').value) || 0;
+            
+            // Calculate total deductions
+            const totalDeductions = deduction80C + deduction80D + deduction80G + 
+                                  deduction80E + deduction80TTA + standardDeduction;
+            
+            // Calculate taxable income
+            const taxableIncome = Math.max(0, grossIncome - totalDeductions);
+            
+            // Get appropriate tax slabs based on age category
+            let slabs = [];
+            if (ageCategory.includes("Super Senior")) {
+                slabs = superSeniorSlabs;
+            } else if (ageCategory.includes("Senior")) {
+                slabs = seniorSlabs;
+            } else {
+                slabs = generalSlabs;
+            }
+            
+            // Calculate tax based on slabs
+            let tax = 0;
+            let remainingIncome = taxableIncome;
+            
+            for (let i = 0; i < slabs.length && remainingIncome > 0; i++) {
+                const slab = slabs[i];
+                if (remainingIncome > slab.from) {
+                    const slabAmount = Math.min(remainingIncome, slab.to) - slab.from;
+                    tax += slabAmount * (slab.rate / 100);
+                }
+            }
+            
+            // Round up the tax value
+            tax = roundUp(tax);
+            
+            // Calculate surcharge
+            let surcharge = 0;
+            if (grossIncome > 5000000 && grossIncome <= 10000000) {
+                surcharge = roundUp(tax * 0.10);
+            } else if (grossIncome > 10000000 && grossIncome <= 20000000) {
+                surcharge = roundUp(tax * 0.15);
+            } else if (grossIncome > 20000000 && grossIncome <= 50000000) {
+                surcharge = roundUp(tax * 0.25);
+            } else if (grossIncome > 50000000) {
+                surcharge = roundUp(tax * 0.37);
+            }
+            
+            // Calculate health and education cess (round up)
+            const cess = roundUp((tax + surcharge) * 0.04);
+            
+            // Calculate total tax liability (already rounded components)
+            const totalTax = tax + surcharge + cess;
+            
+            // Display results
+            document.getElementById('resultName').textContent = name;
+            document.getElementById('resultPAN').textContent = pan;
+            document.getElementById('resultDOB').textContent = new Date(dob).toLocaleDateString();
+            document.getElementById('resultAgeCategory').textContent = ageCategory;
+            document.getElementById('totalIncome').textContent = grossIncome.toLocaleString('en-IN');
+            document.getElementById('totalDeductions').textContent = totalDeductions.toLocaleString('en-IN');
+            document.getElementById('taxableIncome').textContent = taxableIncome.toLocaleString('en-IN');
+            document.getElementById('incomeTax').textContent = tax.toLocaleString('en-IN');
+            document.getElementById('cess').textContent = cess.toLocaleString('en-IN');
+            document.getElementById('totalTax').textContent = totalTax.toLocaleString('en-IN');
+            document.getElementById('printDate').textContent = new Date().toLocaleString();
+            
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('printBtn').style.display = 'inline-block';
+        }
+        
+        function resetForm() {
+            document.getElementById('taxForm').reset();
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('printBtn').style.display = 'none';
+            document.getElementById('ageCategory').value = '';
+            document.getElementById('panError').textContent = '';
+        }
+        
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('pan').addEventListener('blur', validatePAN);
+            document.getElementById('dob').addEventListener('change', function() {
+                if (this.value) {
+                    document.getElementById('ageCategory').value = calculateAgeCategory(this.value);
+                }
+            });
+            
+            // Fetch tax slabs when page loads
+            fetchTaxSlabs();
+        });
+    </script>
+</body>
+</html>
