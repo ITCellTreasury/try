@@ -116,7 +116,7 @@
         </table>
         
         <div class="refresh-info">
-            Last updated: <span id="lastUpdated">Never</span> | Auto-refreshing every minute
+            Last updated: <span id="lastUpdated">Never</span> | Auto-Update every 15Sec.
         </div>
     </div>
 
@@ -259,8 +259,8 @@
         updateCurrentDateBadge();
         loadQueueData();
         
-        // Auto-refresh every minute (60000 ms)
-        setInterval(loadQueueData, 60000);
+        // Auto-refresh every 15sec
+        setInterval(loadQueueData, 15000);
     </script>
 </body>
 </html>
