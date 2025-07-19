@@ -253,8 +253,8 @@
             SPREADSHEET_ID: '1EhTc8vUmwZZthssjqeGcS-AnHshOFL_gliFV3zFgdps', // From your sheet URL
             API_KEY: 'AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4',          // From Google Cloud Console
             SHEET_NAME: 'keywords',                  // Your sheet tab name
-            DEFAULT_RESPONSE: "I'm not sure how to respond to that. Try asking something else.",
-            WELCOME_MESSAGE: "Hello! I'm your WhatsApp-style bot. How can I help you today?"
+            DEFAULT_RESPONSE: "🙁 I'm not sure how to respond to that. Try asking something else.",
+            WELCOME_MESSAGE: "🙂 Hello! I'm your WhatsApp-style bot. How can I help you today?"
         };
         
         // DOM elements
@@ -293,7 +293,7 @@
                     .catch(error => {
                         console.error('Error:', error);
                         hideTypingIndicator();
-                        addMessage("Sorry, I'm having trouble connecting to my database.", 'received');
+                        addMessage("🙁Sorry, I'm having trouble connecting to my database.", 'received');
                         saveChatHistory();
                     });
             }, 1000);
@@ -356,7 +356,7 @@
                 return CONFIG.DEFAULT_RESPONSE;
             } catch (error) {
                 console.error('Error fetching from Google Sheets:', error);
-                return "Sorry, I'm having trouble connecting to my database.";
+                return "🙁 Sorry, I'm having trouble connecting to my database.";
             }
         }
         
