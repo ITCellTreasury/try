@@ -384,7 +384,7 @@
     // Register service worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/bot/sw.js')
+            navigator.serviceWorker.register('/try/chat/sw.js')
                 .then(registration => {
                     console.log('ServiceWorker registration successful');
                 })
