@@ -241,30 +241,7 @@
 
   <script>
    // Theme management
-    const themeToggle = document.getElementById('theme-toggle');
-    const html = document.documentElement;
-
-    // Check for saved theme preference or default to dark
-    if (localStorage.getItem('theme') === 'light') {
-        html.setAttribute('data-bs-theme', 'light');
-        themeToggle.checked = false;
-    } else {
-        html.setAttribute('data-bs-theme', 'dark');
-        themeToggle.checked = true;
-        localStorage.setItem('theme', 'dark'); // Set dark as default if no preference exists
-    }
-
-    // Toggle theme
-    themeToggle.addEventListener('change', () => {
-        if (themeToggle.checked) {
-            html.setAttribute('data-bs-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            html.setAttribute('data-bs-theme', 'light');
-            localStorage.setItem('theme', 'light');
-        }
-    });
-
+   
     // Configuration
     const CONFIG = {
         SPREADSHEET_ID: '1EhTc8vUmwZZthssjqeGcS-AnHshOFL_gliFV3zFgdps',
