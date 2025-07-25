@@ -1,7 +1,7 @@
 {
-  "name": "IT Cell ChatBoat",
-  "short_name": "IT Cell Chat",
-  "description": "chatbot for IT Cell",
+  "name": "IT Cell ChatBoat Plus",
+  "short_name": "IT Cell Chat Plus",
+  "description": "IT Cell Chatbot App with Database Updation Feature",
   "start_url": "/try/chat/index.html",
   "display": "standalone",
   "background_color": "#1F2C34",
