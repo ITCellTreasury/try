@@ -254,6 +254,9 @@
         // Store previous token data for comparison
         let previousTokenData = {};
         
+        // Preload notification bell sound
+        const notificationBell = new Audio("http://itcelltreasury.github.io/try/bell.mp3");
+        
         // Function to fetch data from Google Sheets
         async function fetchTokenData() {
             try {
@@ -370,14 +373,25 @@
                     const oldToken = previousTokenData[section].currentToken;
                     
                     if (newToken !== oldToken && newToken !== null) {
-                        // Token has changed, announce it
-                        announceToken(section, newToken);
+                        // Token has changed, play bell and announce it
+                        playNotificationBell().then(() => {
+                            announceToken(section, newToken);
+                        });
                     }
                 }
             }
             
             // Update previous data
             previousTokenData = JSON.parse(JSON.stringify(newData));
+        }
+        
+        // Play notification bell sound
+        function playNotificationBell() {
+            return new Promise((resolve) => {
+                notificationBell.currentTime = 0;
+                notificationBell.play();
+                notificationBell.onended = resolve;
+            });
         }
         
         // Announce token using speech synthesis
