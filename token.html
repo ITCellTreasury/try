@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>District Treasury Trivandrum - Token Queue</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            padding: 10px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            background-color: #000;
+            border: 3px solid #ffcc00;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+        }
+        
+        .header {
+            background: linear-gradient(to right, #1a5276, #2e86c1);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid #ffcc00;
+        }
+        
+        h1 {
+            font-size: 3.5vw;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+        }
+        
+        .subheading {
+            font-size: 2vw;
+            color: #ffcc00;
+            margin-top: 5px;
+        }
+        
+        .content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        
+        th, td {
+            padding: 20px 15px;
+            text-align: center;
+            border: 2px solid #333;
+            font-size: 2.5vw;
+        }
+        
+        th {
+            background: linear-gradient(to bottom, #2e86c1, #1a5276);
+            color: #fff;
+            position: sticky;
+            top: 0;
+            font-size: 3vw;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            padding: 25px 15px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #1a1a1a;
+        }
+        
+        tr:nth-child(odd) {
+            background-color: #2a2a2a;
+        }
+        
+        tr:hover {
+            background-color: #333;
+        }
+        
+        .current-token {
+            font-weight: bold;
+            color: #ffcc00;
+            font-size: 3.5vw;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+        }
+        
+        .queued-token {
+            background-color: #ffcc00;
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 2.5vw;
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+        }
+        
+        /* Scroll reel styles */
+        .scroll-reel-container {
+            background: linear-gradient(to right, #1a5276, #2e86c1);
+            padding: 10px;
+            border-top: 2px solid #ffcc00;
+            border-bottom: 2px solid #ffcc00;
+            overflow: hidden;
+            position: relative;
+            display: none; /* Hidden by default, shown when content exists */
+        }
+        
+        .scroll-reel {
+            white-space: nowrap;
+            animation: scroll 30s linear infinite;
+        }
+        
+        .scroll-reel-content {
+            display: inline-block;
+            padding-right: 50px;
+            font-size: 2vw;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .footer {
+            background: linear-gradient(to right, #1a5276, #2e86c1);
+            padding: 15px;
+            text-align: center;
+            border-top: 3px solid #ffcc00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .last-updated {
+            font-size: 2vw;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .clock {
+            font-size: 2.5vw;
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 3vw;
+            color: #ffcc00;
+        }
+        
+        /* Animation for current token */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .current-token {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            th, td { padding: 15px 10px; font-size: 2.8vw; }
+            th { font-size: 3.2vw; }
+            .current-token { font-size: 3.8vw; }
+            .queued-token { font-size: 2.8vw; padding: 8px 12px; }
+            .scroll-reel-content { font-size: 2.5vw; }
+        }
+        
+        @media (max-width: 768px) {
+            th, td { padding: 12px 8px; font-size: 3.2vw; }
+            th { font-size: 3.6vw; padding: 18px 10px; }
+            .current-token { font-size: 4.2vw; }
+            .queued-token { font-size: 3.2vw; padding: 6px 10px; }
+            h1 { font-size: 4.5vw; }
+            .subheading { font-size: 3.5vw; }
+            .last-updated, .clock { font-size: 3vw; }
+            .scroll-reel-content { font-size: 3vw; }
+        }
+        
+        @media (max-height: 800px) {
+            th, td { padding: 12px 10px; font-size: 2.2vw; }
+            th { font-size: 2.6vw; padding: 15px 10px; }
+            .current-token { font-size: 2.8vw; }
+            .queued-token { font-size: 2vw; padding: 5px 8px; }
+            .scroll-reel-content { font-size: 2vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>District Treasury Trivandrum</h1>
+            <div class="subheading">Token Queue Display</div>
+        </div>
+        
+        <div class="content">
+            <div class="table-container" id="token-table">
+                <div class="loading">Loading token data...</div>
+            </div>
+        </div>
+        
+        <!-- Scroll reel area -->
+        <div class="scroll-reel-container" id="scroll-reel-container">
+            <div class="scroll-reel">
+                <div class="scroll-reel-content" id="scroll-reel-content"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="last-updated" id="last-updated"></div>
+            <div class="clock" id="clock"></div>
+        </div>
+    </div>
+
+    <script>
+        // Google Sheets API configuration
+        const SPREADSHEET_ID = '11AWbKR2rR2YQYm6AdjEQsw-na9QObL0wfw6eAi4MEdM';
+        const API_KEY = 'AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4';
+        const SHEET_NAME = '101';
+        const SETTINGS_SHEET = 'settings';
+        
+        // Store previous token data for comparison
+        let previousTokenData = {};
+        
+        // Function to fetch data from Google Sheets
+        async function fetchTokenData() {
+            try {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return processData(data.values);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('token-table').innerHTML = 
+                    '<div class="loading">Error loading token data. Please try again later.</div>';
+                return null;
+            }
+        }
+        
+        // Function to fetch scroll reel content
+        async function fetchScrollReelContent() {
+            try {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SETTINGS_SHEET}!C2:C?key=${API_KEY}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return processScrollReelData(data.values);
+            } catch (error) {
+                console.error('Error fetching scroll reel content:', error);
+                return null;
+            }
+        }
+        
+        // Process scroll reel data
+        function processScrollReelData(values) {
+            if (!values || values.length === 0) return null;
+            
+            // Combine all non-empty cells into a single string
+            let content = '';
+            for (let i = 0; i < values.length; i++) {
+                if (values[i] && values[i][0] && values[i][0].trim() !== '') {
+                    content += values[i][0] + ' • ';
+                }
+            }
+            
+            // Remove the last separator
+            if (content.endsWith(' • ')) {
+                content = content.slice(0, -3);
+            }
+            
+            return content;
+        }
+        
+        // Process the data from Google Sheets
+        function processData(values) {
+            if (!values || values.length < 2) return {};
+            
+            // Extract headers and rows
+            const headers = values[0];
+            const rows = values.slice(1);
+            
+            // Create a map to organize tokens by section
+            const sectionsMap = {};
+            
+            // Process each row
+            rows.forEach(row => {
+                if (row.length < headers.length) return;
+                
+                const section = row[1]; // Column B: section
+                const tokenNo = parseInt(row[2]); // Column C: tokenNo
+                const status = row[5]; // Column F: status
+                
+                if (!sectionsMap[section]) {
+                    sectionsMap[section] = {
+                        currentToken: null,
+                        queuedTokens: []
+                    };
+                }
+                
+                if (status === 'Pass') {
+                    // Update current token if this token number is higher
+                    if (!sectionsMap[section].currentToken || tokenNo > sectionsMap[section].currentToken) {
+                        sectionsMap[section].currentToken = tokenNo;
+                    }
+                } else if (status === 'In Que') {
+                    sectionsMap[section].queuedTokens.push(tokenNo);
+                }
+            });
+            
+            // Sort queued tokens for each section
+            for (const section in sectionsMap) {
+                sectionsMap[section].queuedTokens.sort((a, b) => a - b);
+            }
+            
+            return sectionsMap;
+        }
+        
+        // Check for changes and announce if needed
+        function checkForChangesAndAnnounce(newData) {
+            if (!newData || Object.keys(previousTokenData).length === 0) {
+                previousTokenData = JSON.parse(JSON.stringify(newData));
+                return;
+            }
+            
+            // Check each section for changes
+            for (const section in newData) {
+                if (previousTokenData[section]) {
+                    const newToken = newData[section].currentToken;
+                    const oldToken = previousTokenData[section].currentToken;
+                    
+                    if (newToken !== oldToken && newToken !== null) {
+                        // Token has changed, announce it
+                        announceToken(section, newToken);
+                    }
+                }
+            }
+            
+            // Update previous data
+            previousTokenData = JSON.parse(JSON.stringify(newData));
+        }
+        
+        // Announce token using speech synthesis
+        function announceToken(section, tokenNumber) {
+            if ('speechSynthesis' in window) {
+                const speech = new SpeechSynthesisUtterance();
+                speech.text = `Token Number ${tokenNumber} for ${section}`;
+                speech.volume = 1;
+                speech.rate = 0.9;
+                speech.pitch = 1;
+                
+                // Try to find a female voice
+                const voices = speechSynthesis.getVoices();
+                const femaleVoice = voices.find(voice => 
+                    voice.name.includes('Female') || voice.name.includes('Woman') || 
+                    voice.name.includes('Zira') || voice.lang.includes('en-US')
+                );
+                
+                if (femaleVoice) {
+                    speech.voice = femaleVoice;
+                }
+                
+                window.speechSynthesis.speak(speech);
+            }
+        }
+        
+        // Generate the HTML table from processed data
+        function generateTable(data) {
+            if (!data || Object.keys(data).length === 0) {
+                return '<div class="loading">No token data available</div>';
+            }
+            
+            // Get sections and sort them in ascending order
+            const sortedSections = Object.keys(data).sort((a, b) => {
+                // Extract numbers from section names for proper numerical sorting
+                const numA = parseInt(a.replace(/\D/g, '')) || 0;
+                const numB = parseInt(b.replace(/\D/g, '')) || 0;
+                return numA - numB;
+            });
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Current Token</th>
+                            <th>Tokens in Queue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // Iterate through sorted sections
+            for (const section of sortedSections) {
+                const sectionData = data[section];
+                html += `
+                    <tr>
+                        <td>${section}</td>
+                        <td class="current-token">${sectionData.currentToken || '--'}</td>
+                        <td>
+                `;
+                
+                if (sectionData.queuedTokens.length > 0) {
+                    sectionData.queuedTokens.forEach(token => {
+                        html += `<span class="queued-token">${token}</span>`;
+                    });
+                } else {
+                    html += '--';
+                }
+                
+                html += `
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            return html;
+        }
+        
+        // Update the table with new data
+        async function updateTable() {
+            const data = await fetchTokenData();
+            if (data) {
+                checkForChangesAndAnnounce(data);
+                document.getElementById('token-table').innerHTML = generateTable(data);
+                
+                // Update last updated timestamp
+                const now = new Date();
+                document.getElementById('last-updated').textContent = 
+                    `Last updated: ${now.toLocaleTimeString()}`;
+            }
+        }
+        
+        // Update scroll reel content
+        async function updateScrollReel() {
+            const content = await fetchScrollReelContent();
+            const container = document.getElementById('scroll-reel-container');
+            const contentElement = document.getElementById('scroll-reel-content');
+            
+            if (content && content.trim() !== '') {
+                contentElement.textContent = content;
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+        
+        // Update clock function
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            const dateStr = now.toLocaleDateString();
+            document.getElementById('clock').textContent = `${dateStr} | ${timeStr}`;
+        }
+        
+        // Initial load
+        updateTable();
+        updateClock();
+        updateScrollReel();
+        
+        // Set up periodic refresh
+        setInterval(updateTable, 2000);
+        setInterval(updateClock, 1000);
+        setInterval(updateScrollReel, 30000); // Update scroll reel every 30 seconds
+    </script>
+</body>
+</html>
