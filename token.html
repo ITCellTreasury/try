@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         body {
             font-family: Arial, sans-serif;
             background-color: #000;
@@ -18,9 +18,9 @@
             overflow: hidden;
             height: 100vh;
             width: 100vw;
-            padding: 10px;
+          
         }
-        
+
         .container {
             display: flex;
             flex-direction: column;
@@ -32,110 +32,127 @@
             overflow: hidden;
             box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
         }
-        
+
         .header {
             background: linear-gradient(to right, #1a5276, #2e86c1);
             padding: 15px;
             text-align: center;
             border-bottom: 3px solid #ffcc00;
         }
-        
+
         h1 {
-           
             color: #fff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             margin: 0;
         }
-        
+
         .subheading {
-            font-size: 2vw;
+            font-size: 3vw;
             color: #ffcc00;
             margin-top: 5px;
         }
-        
+
         .content {
             flex: 1;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
-        
+
         .table-container {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+           /* padding: 15px;*/
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 0 auto;
+            table-layout: fixed; /* Changed back to fixed for consistent columns */
         }
-        
+
         th, td {
-            padding: 20px 15px;
+            padding: 12px 15px;
             text-align: center;
             border: 2px solid #333;
-            font-size: 2vw;
+            font-size: 2.5vw;
+            word-wrap: break-word;
         }
-        
+
+        /* Better column width distribution */
+        th:nth-child(1), td:nth-child(1) { /* Counter column */
+            width: 20%; /* More space for counter names */
+            min-width: 120px;
+        }
+
+        th:nth-child(2), td:nth-child(2) { /* Current Token column */
+            width: 15%; /* Fixed width for token numbers */
+            min-width: 100px;
+        }
+
+        th:nth-child(3), td:nth-child(3) { /* In Queue column */
+            width: 65%; /* Most space for queued tokens */
+            min-width: 200px;
+        }
+
         th {
             background: linear-gradient(to bottom, #2e86c1, #1a5276);
             color: #fff;
             position: sticky;
             top: 0;
-            font-size: 2vw;
+            font-size: 2.5vw;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            padding: 25px 15px;
+            padding: 15px 10px;
         }
-        
+
         tr:nth-child(even) {
             background-color: #1a1a1a;
         }
-        
+
         tr:nth-child(odd) {
             background-color: #2a2a2a;
         }
-        
+
         tr:hover {
             background-color: #333;
         }
-        
+
         .current-token {
             font-weight: bold;
             color: #ffcc00;
-            font-size: 2.5vw;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+            font-size: 4vw;
         }
-        
+
         .queued-token {
             background-color: #ffcc00;
             color: #000;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin: 5px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 3px;
             display: inline-block;
             font-weight: bold;
-            font-size: 2vw;
-            box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+            font-size: 3vw;
+            box-shadow: 0 0 6px rgba(255, 204, 0, 0.5);
+            white-space: nowrap;
         }
-        
+
         /* Scroll reel styles */
         .scroll-reel-container {
             background:linear-gradient(to right, #1a5276, #03133e);
             padding: 10px;
             border-top: 2px solid #ffcc00;
-            border-bottom: 2px solid #ffcc00;
+            /*border-bottom: 2px solid #ffcc00;*/
             overflow: hidden;
             position: relative;
-            display: none; /* Hidden by default, shown when content exists */
+            display: none;
         }
-        
+
         .scroll-reel {
             white-space: nowrap;
             animation: scroll 30s linear infinite;
         }
-        
+
         .scroll-reel-content {
             display: inline-block;
             padding-right: 50px;
@@ -143,12 +160,12 @@
             color: #fff;
             font-weight: bold;
         }
-        
+
         @keyframes scroll {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
-        
+
         .footer {
             background: linear-gradient(to right, #1a5276, #2e86c1);
             padding: 15px;
@@ -158,63 +175,178 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .last-updated {
             font-size: 2vw;
             color: #ffcc00;
             font-weight: bold;
         }
-        
+
         .clock {
             font-size: 2.5vw;
             color: #fff;
             font-weight: bold;
         }
-        
+
         .loading {
             text-align: center;
             padding: 40px;
             font-size: 3vw;
             color: #ffcc00;
         }
-        
+
         /* Animation for current token */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
-        
+
         .current-token {
             animation: pulse 2s infinite;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 1200px) {
-            th, td { padding: 15px 10px; font-size: 2.8vw; }
-            th { font-size: 3.2vw; }
-            .current-token { font-size: 3.8vw; }
-            .queued-token { font-size: 2.8vw; padding: 8px 12px; }
-            .scroll-reel-content { font-size: 2.5vw; }
+            th, td { 
+                padding: 12px 10px; 
+                font-size: 2.8vw; 
+            }
+            th { 
+                font-size: 3vw; 
+                padding: 12px 8px;
+            }
+            .current-token { 
+                font-size: 3.5vw; 
+            }
+            .queued-token { 
+                font-size: 2.2vw; 
+                padding: 6px 10px; 
+            }
+            .scroll-reel-content { 
+                font-size: 2.2vw; 
+            }
+            
+            th:nth-child(1), td:nth-child(1) { 
+                width: 30%;
+                min-width: 100px;
+            }
+            th:nth-child(2), td:nth-child(2) { 
+                width: 20%;
+                min-width: 80px;
+            }
+            th:nth-child(3), td:nth-child(3) { 
+                width: 50%;
+                min-width: 150px;
+            }
         }
-        
+
         @media (max-width: 768px) {
-            th, td { padding: 12px 8px; font-size: 3.2vw; }
-            th { font-size: 3.6vw; padding: 18px 10px; }
-            .current-token { font-size: 4.2vw; }
-            .queued-token { font-size: 3.2vw; padding: 6px 10px; }
-            h1 { font-size: 4.5vw; }
-            .subheading { font-size: 3.5vw; }
-            .last-updated, .clock { font-size: 3vw; }
-            .scroll-reel-content { font-size: 3vw; }
+            th, td { 
+                padding: 10px 8px; 
+                font-size: 3vw; 
+            }
+            th { 
+                font-size: 3.2vw; 
+                padding: 10px 6px;
+            }
+            .current-token { 
+                font-size: 3.8vw; 
+            }
+            .queued-token { 
+                font-size: 2.5vw; 
+                padding: 5px 8px; 
+                margin: 2px;
+            }
+            h1 { 
+                font-size: 4.5vw; 
+            }
+            .subheading { 
+                font-size: 3.5vw; 
+            }
+            .last-updated, .clock { 
+                font-size: 2.8vw; 
+            }
+            .scroll-reel-content { 
+                font-size: 2.5vw; 
+            }
+            
+            th:nth-child(1), td:nth-child(1) { 
+                width: 35%;
+                min-width: 80px;
+            }
+            th:nth-child(2), td:nth-child(2) { 
+                width: 20%;
+                min-width: 70px;
+            }
+            th:nth-child(3), td:nth-child(3) { 
+                width: 45%;
+                min-width: 120px;
+            }
         }
-        
+
         @media (max-height: 800px) {
-            th, td { padding: 12px 10px; font-size: 2.2vw; }
-            th { font-size: 2.6vw; padding: 15px 10px; }
-            .current-token { font-size: 2.8vw; }
-            .queued-token { font-size: 2vw; padding: 5px 8px; }
-            .scroll-reel-content { font-size: 2vw; }
+            th, td { 
+                padding: 10px 8px; 
+                font-size: 2.2vw; 
+            }
+            th { 
+                font-size: 2.4vw; 
+                padding: 10px 6px;
+            }
+            .current-token { 
+                font-size: 2.6vw; 
+            }
+            .queued-token { 
+                font-size: 1.8vw; 
+                padding: 4px 6px; 
+            }
+            .scroll-reel-content { 
+                font-size: 1.8vw; 
+            }
+            
+            th:nth-child(1), td:nth-child(1) { 
+                width: 25%;
+                min-width: 100px;
+            }
+            th:nth-child(2), td:nth-child(2) { 
+                width: 25%;
+                min-width: 80px;
+            }
+            th:nth-child(3), td:nth-child(3) { 
+                width: 50%;
+                min-width: 150px;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 480px) {
+            th, td { 
+                padding: 8px 4px; 
+                font-size: 3.2vw; 
+            }
+            th { 
+                font-size: 3.4vw; 
+                padding: 8px 4px;
+            }
+            .current-token { 
+                font-size: 4vw; 
+            }
+            .queued-token { 
+                font-size: 2.8vw; 
+                padding: 4px 6px; 
+                margin: 1px;
+            }
+            
+            th:nth-child(1), td:nth-child(1) { 
+                width: 40%;
+            }
+            th:nth-child(2), td:nth-child(2) { 
+                width: 20%;
+            }
+            th:nth-child(3), td:nth-child(3) { 
+                width: 40%;
+            }
         }
     </style>
 </head>
@@ -222,7 +354,6 @@
     <div class="container">
         <div class="header" style="display:none;">
             <h1>District Treasury Trivandrum</h1>
-            
         </div>
         
         <div class="content">
@@ -437,8 +568,8 @@
                     <thead>
                         <tr>
                             <th>Counter</th>
-                            <th>Current Token</th>
-                            <th>in Queue</th>
+                            <th>Token</th>
+                            <th>In Queue</th>
                         </tr>
                     </thead>
                     <tbody>
