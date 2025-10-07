@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTR New Format | IT Cell HelpDesk</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: none;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 30px;
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .input-group-text {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+        }
+        
+        .result-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .status-found {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-not-found {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .extracted-utr {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        
+        .instructions {
+            background-color: #fff9e6;
+            border-left: 4px solid #f1c40f;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .api-info {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+        }
+        
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .last-updated {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+            width: 150px;
+        }
+        
+        .detail-value {
+            color: #2c3e50;
+            flex: 1;
+            word-break: break-all;
+        }
+        
+        .sheet-selector {
+            min-width: 180px;
+        }
+        
+        @media (max-width: 768px) {
+            .sheet-selector {
+                min-width: 150px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .input-group > * {
+                margin-bottom: 10px;
+            }
+            
+            .input-group > :not(:last-child) {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center">
+                <h1 class="mb-2">UTR New Format Search</h1>
+              
+            </div>
+            
+            <div class="card-body">
+                <div class="alert alert-warning instructions" id="instructions">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="alert-heading mb-0"><i class="fas fa-info-circle me-2"></i>How to Use</h5>
+                        <button type="button" class="btn-close" id="close-instructions"></button>
+                    </div>
+                    <ol class="mb-0">
+                        <li>Select the date range from dropdown</li>
+                        <li>Enter UTR with RBISH format and click Search</li>
+                        <li>Search New UTR with BiMS > UTR Search</li>
+                    </ol>
+                </div>
+                
+                <button class="btn btn-outline-primary btn-sm mb-3" id="show-instructions" style="display: none;">
+                    <i class="fas fa-question-circle me-1"></i>Show Instructions
+                </button>
+                
+                <div class="mb-4">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="sheet-select" class="form-label fw-bold">Date Range</label>
+                            <select class="form-select sheet-selector" id="sheet-select">
+                                <option value="" selected disabled>Loading sheets...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label for="utr-input" class="form-label fw-bold">Enter UTR Number</label>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" id="utr-input" placeholder="e.g., RBISH0123456789" maxlength="50">
+                                <button class="btn btn-primary" type="button" id="lookup-btn">Search</button>
+                                <button class="btn btn-outline-secondary" type="button" id="clear-btn">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-2" id="status" style="display: none;"></div>
+                    
+                    <div class="extracted-utr" id="extracted-utr" style="display: none;">
+                        <strong>Extracted UTR for search:</strong> <span id="extracted-value"></span>
+                    </div>
+                </div>
+                
+                <div class="result-section" id="result-section" style="display: none;">
+                    <div class="result-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Search Result</h5>
+                            <span class="badge rounded-pill" id="result-status">Found</span>
+                        </div>
+                        
+                        <div class="result-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Selected Range:</span>
+                                <span class="detail-value" id="selected-sheet">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Search UTR:</span>
+                                <span class="detail-value" id="search-utr">-</span>
+                            </div>
+                            <div class="detail-row" style="display:none;">
+                                <span class="detail-label">Extracted UTR:</span>
+                                <span class="detail-value" id="extracted-utr-display">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">New UTR:</span>
+                                <span class="detail-value" id="new-utr" style="color:red;font-weight:bold">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Date:</span>
+                                <span class="detail-value" id="result-date">-</span>
+                            </div>
+                            <div class="detail-row" style="display:none;">
+                                <span class="detail-label">Full Value:</span>
+                                <span class="detail-value" id="full-cell-value">-</span>
+                            </div>
+                            <div class="detail-row" style="display:none;">
+                                <span class="detail-label">Status:</span>
+                                <span class="detail-value" id="result-message">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="history-section mt-4" id="history-section" style="display: none;">
+                    <h6 class="fw-bold mb-2">Recent Searches:</h6>
+                    <div class="history-list" id="history-list">
+                        <!-- History items will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // API Configuration
+            const API_KEY = 'AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4';
+            const SPREADSHEET_ID = '10W5sxg5tyoE7N4h2khLd5t5tCfR6-YYyUl9OJuS41ZI';
+            const RANGE = 'A:C'; // Columns: Date, Old UTR, New UTR
+            
+            // DOM Elements
+            const sheetSelect = document.getElementById('sheet-select');
+            const utrInput = document.getElementById('utr-input');
+            const lookupBtn = document.getElementById('lookup-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultSection = document.getElementById('result-section');
+            const resultStatus = document.getElementById('result-status');
+            const selectedSheetElement = document.getElementById('selected-sheet');
+            const searchUtr = document.getElementById('search-utr');
+            const extractedUtrDisplay = document.getElementById('extracted-utr-display');
+            const newUtr = document.getElementById('new-utr');
+            const resultDate = document.getElementById('result-date');
+            const fullCellValue = document.getElementById('full-cell-value');
+            const resultMessage = document.getElementById('result-message');
+            const statusDiv = document.getElementById('status');
+            const historySection = document.getElementById('history-section');
+            const historyList = document.getElementById('history-list');
+            const extractedUtrDiv = document.getElementById('extracted-utr');
+            const extractedValue = document.getElementById('extracted-value');
+            const instructionsDiv = document.getElementById('instructions');
+            const closeInstructionsBtn = document.getElementById('close-instructions');
+            const showInstructionsBtn = document.getElementById('show-instructions');
+            
+            
+            let searchHistory = JSON.parse(localStorage.getItem('utrSearchHistory')) || [];
+            let instructionsHidden = localStorage.getItem('instructionsHidden') === 'true';
+            let availableSheets = [];
+            
+            // Initialize instructions display
+            updateInstructionsDisplay();
+            
+            // Event Listeners
+            lookupBtn.addEventListener('click', performLookup);
+            clearBtn.addEventListener('click', clearSearch);
+            closeInstructionsBtn.addEventListener('click', hideInstructions);
+            showInstructionsBtn.addEventListener('click', showInstructions);
+            
+            utrInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performLookup();
+                }
+            });
+            
+            utrInput.addEventListener('input', function() {
+                // Auto-format to uppercase
+                this.value = this.value.toUpperCase();
+                
+                // Extract and show UTR preview
+                const extracted = extractUTR(this.value);
+                if (extracted && extracted !== this.value) {
+                    extractedValue.textContent = extracted;
+                    extractedUtrDiv.style.display = 'block';
+                } else {
+                    extractedUtrDiv.style.display = 'none';
+                }
+                
+                // Enable/disable lookup button based on input and sheet selection
+                updateLookupButtonState();
+            });
+            
+            sheetSelect.addEventListener('change', function() {
+                updateLookupButtonState();
+            });
+            
+            // Fetch available sheets and initialize
+            fetchAvailableSheets();
+            
+            // Update lookup button state based on input and selection
+            function updateLookupButtonState() {
+                const hasInput = utrInput.value.trim();
+                const hasSheet = sheetSelect.value && sheetSelect.value !== '';
+                lookupBtn.disabled = !hasInput || !hasSheet;
+            }
+            
+            // Fetch available sheets from Google Sheets
+            async function fetchAvailableSheets() {
+                try {
+                    showStatus('Loading available date ranges...', 'progress');
+                    
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${API_KEY}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.sheets && data.sheets.length > 0) {
+                        availableSheets = data.sheets.map(sheet => sheet.properties.title);
+                        populateSheetDropdown(availableSheets);
+                        showStatus('Date-range loaded successfully', 'success');
+                        setTimeout(() => statusDiv.style.display = 'none', 2000);
+                    } else {
+                        throw new Error('No sheets found in the spreadsheet');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error fetching sheets:', error);
+                    showStatus('Error loading sheets: ' + error.message, 'error');
+                    sheetSelect.innerHTML = '<option value="" selected disabled>Error loading sheets</option>';
+                }
+            }
+            
+            // Populate sheet dropdown
+            function populateSheetDropdown(sheets) {
+                sheetSelect.innerHTML = '';
+                
+                if (sheets.length === 0) {
+                    sheetSelect.innerHTML = '<option value="" selected disabled>No sheets available</option>';
+                    return;
+                }
+                
+                // Sort sheets to put most recent first (assuming newer sheets have later names)
+                const sortedSheets = sheets.sort().reverse();
+                
+                sortedSheets.forEach(sheetName => {
+                    const option = document.createElement('option');
+                    option.value = sheetName;
+                    option.textContent = sheetName;
+                    sheetSelect.appendChild(option);
+                });
+                
+                // Auto-select the first sheet
+                if (sortedSheets.length > 0) {
+                    sheetSelect.value = sortedSheets[0];
+                }
+            }
+            
+            // Extract UTR from various formats
+            function extractUTR(input) {
+                if (!input) return '';
+                
+                // Remove any spaces
+                input = input.trim();
+                
+                // Case 1: Already in RBISH0 format
+                if (input.startsWith('RBISH0')) {
+                    return input;
+                }
+                
+                // Case 2: Format like /XUTR/RBISH0123456789
+                if (input.includes('/XUTR/')) {
+                    const parts = input.split('/XUTR/');
+                    if (parts.length > 1 && parts[1].startsWith('RBISH0')) {
+                        return parts[1];
+                    }
+                }
+                
+                // Case 3: Try to extract RBISH0 followed by numbers
+                const utrMatch = input.match(/RBISH0\d+/);
+                if (utrMatch) {
+                    return utrMatch[0];
+                }
+                
+                // Case 4: Return original input (let API handle validation)
+                return input;
+            }
+            
+            // Perform UTR lookup
+            async function performLookup() {
+                const selectedSheet = sheetSelect.value;
+                const inputValue = utrInput.value.trim();
+                
+                if (!selectedSheet) {
+                    showStatus('Please select a date range', 'error');
+                    return;
+                }
+                
+                if (!inputValue) {
+                    showStatus('Please enter a UTR value', 'error');
+                    return;
+                }
+                
+                const extractedUTR = extractUTR(inputValue);
+                
+                // Validate extracted UTR format
+                if (!extractedUTR.startsWith('RBISH0')) {
+                    showStatus('Invalid UTR format. Should start with RBISH0', 'error');
+                    return;
+                }
+                
+                showStatus(`Searching for UTR in ${selectedSheet}...`, 'progress');
+                lookupBtn.disabled = true;
+                
+                try {
+                    const result = await searchUTRInSheet(selectedSheet, extractedUTR);
+                    displayResult(selectedSheet, inputValue, extractedUTR, result);
+                    addToHistory(selectedSheet, inputValue, extractedUTR, result);
+                    
+                } catch (error) {
+                    console.error('Lookup error:', error);
+                    showStatus('Error searching for UTR: ' + error.message, 'error');
+                    lookupBtn.disabled = false;
+                }
+            }
+            
+            // Search UTR in specific Google Sheet
+            async function searchUTRInSheet(sheetName, utrValue) {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${sheetName}!${RANGE}?key=${API_KEY}`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.values || data.values.length === 0) {
+                    return { found: false, message: 'No data found in selected range' };
+                }
+                
+                // Skip header row and search for UTR in column B (index 1)
+                for (let i = 1; i < data.values.length; i++) {
+                    const row = data.values[i];
+                    if (row.length >= 2) {
+                        const cellValue = row[1] || '';
+                        
+                        // Check if cell contains the UTR (in /XUTR/RBISH0 format)
+                        if (cellValue.includes(utrValue)) {
+                            return {
+                                found: true,
+                                date: row[0] || 'N/A',
+                                newUTR: row[2] || 'N/A',
+                                fullCellValue: cellValue,
+                                message: 'UTR found in selected range'
+                            };
+                        }
+                    }
+                }
+                
+                return { found: false, message: 'UTR not found in selected range' };
+            }
+            
+            // Display search result
+            function displayResult(sheetName, inputValue, extractedUTR, result) {
+                selectedSheetElement.textContent = sheetName;
+                searchUtr.textContent = inputValue;
+                extractedUtrDisplay.textContent = extractedUTR;
+                
+                if (result.found) {
+                    resultStatus.textContent = 'Found';
+                    resultStatus.className = 'badge rounded-pill status-found';
+                    newUtr.textContent = result.newUTR;
+                    resultDate.textContent = formatDate(result.date);
+                    fullCellValue.textContent = result.fullCellValue || 'N/A';
+                    resultMessage.textContent = result.message;
+                    resultMessage.style.color = '#155724';
+                } else {
+                    resultStatus.textContent = 'Not Found';
+                    resultStatus.className = 'badge rounded-pill status-not-found';
+                    newUtr.textContent = 'N/A';
+                    resultDate.textContent = 'N/A';
+                    fullCellValue.textContent = 'N/A';
+                    resultMessage.textContent = result.message;
+                    resultMessage.style.color = '#721c24';
+                }
+                
+                resultSection.style.display = 'block';
+                showStatus(result.message, result.found ? 'success' : 'error');
+                lookupBtn.disabled = false;
+            }
+            
+            // Add search to history
+            function addToHistory(sheetName, inputValue, extractedUTR, result) {
+                const historyItem = {
+                    sheet: sheetName,
+                    input: inputValue,
+                    extracted: extractedUTR,
+                    found: result.found,
+                    newUTR: result.newUTR || 'N/A',
+                    timestamp: new Date().toLocaleString()
+                };
+                
+                // Add to beginning of history
+                searchHistory.unshift(historyItem);
+                
+                // Keep only last 10 items
+                if (searchHistory.length > 10) {
+                    searchHistory = searchHistory.slice(0, 10);
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('utrSearchHistory', JSON.stringify(searchHistory));
+                
+                // Update display
+                updateHistoryDisplay();
+            }
+            
+            // Update history display
+            function updateHistoryDisplay() {
+                historyList.innerHTML = '';
+                
+                if (searchHistory.length === 0) {
+                    historySection.style.display = 'none';
+                    return;
+                }
+                
+                searchHistory.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'd-flex justify-content-between align-items-center border-bottom pb-2 mb-2';
+                    
+                    historyItem.innerHTML = `
+                        <div>
+                            <div class="fw-bold">${item.input}</div>
+                            <div class="small text-muted">Range: ${item.sheet} | Extracted: ${item.extracted}</div>
+                            <div class="small text-muted">${item.timestamp}</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge ${item.found ? 'bg-success' : 'bg-danger'}">${item.found ? 'Found' : 'Not Found'}</span>
+                            <div class="small text-muted mt-1">${item.newUTR}</div>
+                        </div>
+                    `;
+                    
+                    historyList.appendChild(historyItem);
+                });
+                
+                historySection.style.display = 'block';
+            }
+            
+            // Clear search
+            function clearSearch() {
+                utrInput.value = '';
+                resultSection.style.display = 'none';
+                extractedUtrDiv.style.display = 'none';
+                statusDiv.style.display = 'none';
+                updateLookupButtonState();
+                utrInput.focus();
+            }
+            
+            // Format date for display
+            function formatDate(dateValue) {
+                if (!dateValue) return 'N/A';
+                
+                try {
+                    // Try to parse as date
+                    const date = new Date(dateValue);
+                    if (!isNaN(date.getTime())) {
+                        return date.toLocaleDateString();
+                    }
+                    return dateValue;
+                } catch (error) {
+                    return dateValue;
+                }
+            }
+            
+            // Show status message
+            function showStatus(message, type) {
+                statusDiv.textContent = message;
+                statusDiv.className = 'alert';
+                statusDiv.style.display = 'block';
+                
+                if (type === 'success') {
+                    statusDiv.classList.add('alert-success');
+                } else if (type === 'error') {
+                    statusDiv.classList.add('alert-danger');
+                } else if (type === 'progress') {
+                    statusDiv.innerHTML = `<span class="loading"></span>${message}`;
+                    statusDiv.classList.add('alert-info');
+                }
+                
+                // Auto-hide success messages after 3 seconds
+                if (type === 'success') {
+                    setTimeout(() => {
+                        if (statusDiv.style.display !== 'none') {
+                            statusDiv.style.display = 'none';
+                        }
+                    }, 3000);
+                }
+            }
+            
+            // Hide instructions
+            function hideInstructions() {
+                instructionsHidden = true;
+                localStorage.setItem('instructionsHidden', 'true');
+                updateInstructionsDisplay();
+            }
+            
+            // Show instructions
+            function showInstructions() {
+                instructionsHidden = false;
+                localStorage.setItem('instructionsHidden', 'false');
+                updateInstructionsDisplay();
+            }
+            
+            // Update instructions display
+            function updateInstructionsDisplay() {
+                if (instructionsHidden) {
+                    instructionsDiv.style.display = 'none';
+                    showInstructionsBtn.style.display = 'block';
+                } else {
+                    instructionsDiv.style.display = 'block';
+                    showInstructionsBtn.style.display = 'none';
+                }
+            }
+            
+            // Auto-focus on input
+            utrInput.focus();
+        });
+    </script>
+</body>
+</html>
