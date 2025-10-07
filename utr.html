@@ -25,8 +25,7 @@
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             border: none;
-            width: 100%;
-            max-width: 900px;
+            min-width: 100%;
         }
         
         .card-header {
@@ -142,21 +141,86 @@
             min-width: 180px;
         }
         
+        /* New responsive styles */
+        .search-controls {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        .search-field {
+            flex: 1;
+        }
+        
+        .search-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .sheet-selector-container {
+            flex: 1;
+        }
+        
+        .utr-input-container {
+            flex: 2;
+        }
+        
         @media (max-width: 768px) {
-            .sheet-selector {
-                min-width: 150px;
-            }
-            
-            .input-group {
+            .search-controls {
                 flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 20px;
             }
             
-            .input-group > * {
-                margin-bottom: 10px;
+            .sheet-selector-container,
+            .utr-input-container {
+                width: 100%;
+                max-width: 400px;
             }
             
-            .input-group > :not(:last-child) {
-                margin-right: 0;
+            .search-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .detail-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .detail-value {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 20px 15px;
+            }
+            
+            .card-header {
+                padding: 15px 20px;
+            }
+            
+            .search-field {
+                min-width: 100%;
+            }
+            
+            .search-actions {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .search-actions .btn {
+                width: 100%;
             }
         }
     </style>
@@ -166,7 +230,7 @@
         <div class="card">
             <div class="card-header text-center">
                 <h1 class="mb-2">UTR New Format Search</h1>
-              
+                <p class="text-muted mb-0">Search for UTR details in the new format</p>
             </div>
             
             <div class="card-body">
@@ -187,30 +251,36 @@
                     <i class="fas fa-question-circle me-1"></i>Show Instructions
                 </button>
                 
-                <div class="mb-4">
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="sheet-select" class="form-label fw-bold">Date Range</label>
-                            <select class="form-select sheet-selector" id="sheet-select">
-                                <option value="" selected disabled>Loading sheets...</option>
-                            </select>
-                        </div>
-                        <div class="col-md-8">
-                            <label for="utr-input" class="form-label fw-bold">Enter UTR Number</label>
-                            <div class="input-group mb-2">
-                                <input type="text" class="form-control" id="utr-input" placeholder="e.g., RBISH0123456789" maxlength="50">
-                                <button class="btn btn-primary" type="button" id="lookup-btn">Search</button>
-                                <button class="btn btn-outline-secondary" type="button" id="clear-btn">Clear</button>
-                            </div>
+                <div class="search-controls mb-4">
+                    <div class="sheet-selector-container">
+                        <label for="sheet-select" class="form-label fw-bold">Date Range</label>
+                        <select class="form-select" id="sheet-select">
+                            <option value="" selected disabled>Loading sheets...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="utr-input-container">
+                        <label for="utr-input" class="form-label fw-bold">Enter UTR Number</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="utr-input" placeholder="e.g., RBISH0123456789" maxlength="50">
                         </div>
                     </div>
                     
-                    <div class="alert alert-info mt-2" id="status" style="display: none;"></div>
-                    
-                    <div class="extracted-utr" id="extracted-utr" style="display: none;">
-                        <strong>Extracted UTR for search:</strong> <span id="extracted-value"></span>
+                    <div class="search-actions">
+                        <button class="btn btn-primary" type="button" id="lookup-btn">
+                            <i class="fas fa-search me-1"></i>Search
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" id="clear-btn">
+                            <i class="fas fa-times me-1"></i>Clear
+                        </button>
                     </div>
                 </div>
+                
+                <div class="extracted-utr" id="extracted-utr" style="display: none;">
+                    <strong>Extracted UTR for search:</strong> <span id="extracted-value"></span>
+                </div>
+                
+                <div class="alert alert-info mt-2" id="status" style="display: none;"></div>
                 
                 <div class="result-section" id="result-section" style="display: none;">
                     <div class="result-card">
