@@ -524,7 +524,7 @@
                     return;
                 }
                 
-                showStatus(`Searching for UTR in ${selectedSheet}...`, 'progress');
+                showStatus(`Searching  UTR- ${selectedSheet}...`, 'progress');
                 lookupBtn.disabled = true;
                 
                 try {
@@ -534,7 +534,7 @@
                     
                 } catch (error) {
                     console.error('Lookup error:', error);
-                    showStatus('Error searching for UTR: ' + error.message, 'error');
+                    showStatus('Error searching UTR- ' + error.message, 'error');
                     lookupBtn.disabled = false;
                 }
             }
