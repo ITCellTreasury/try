@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>District Treasury Trivandrum - Token Queue</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+          
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            background-color: #ffffff;
+            border: 3px solid #2ecc71;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
+        }
+        
+        .header {
+            background: linear-gradient(to right, #3498db, #2ecc71,#3498db);
+           
+            text-align: center;
+            border-bottom: 3px solid #e74c3c;
+        }
+        
+        h1 {
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            font-size: 3.5vw;
+            font-weight: 700;
+        }
+        
+        .subheading {
+            font-size: 2vw;
+            color: #ffffff;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+        
+        .content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+          
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        
+        th, td {
+            
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            font-weight: 600;
+        }
+        
+        th {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            
+        }
+        
+        tr:nth-child(even) {
+            background-color: #ecf0f1;
+        }
+        
+        tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        
+        tr:hover {
+            background-color: #d5dbdb;
+        }
+        
+        .current-token {
+            font-weight: bold;
+            color: #e74c3c;
+            text-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+        }
+        
+        .queued-token {
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px;
+            display: inline-block;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        /* Scroll reel styles */
+        .scroll-reel-container {
+            background: linear-gradient(to right, #3498db, #3498db);
+            padding: 10px;
+            border-top: 2px solid #e74c3c;
+            border-bottom: 2px solid #e74c3c;
+            overflow: hidden;
+            position: relative;
+            display: none;
+        }
+        
+        .scroll-reel {
+            white-space: nowrap;
+            animation: scroll 30s linear infinite;
+        }
+        
+        .scroll-reel-content {
+            display: inline-block;
+            padding-right: 50px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .footer {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            padding: 15px;
+            text-align: center;
+            border-top: 3px solid #e74c3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .clock {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        /* Animation for current token */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .current-token {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            th, td { padding: 15px 10px; }
+            .queued-token { padding: 8px 12px; }
+        }
+        
+        @media (max-width: 768px) {
+            th, td { padding: 12px 8px; }
+            .queued-token { padding: 6px 10px; }
+            h1 { font-size: 4.5vw; }
+            .subheading { font-size: 3.5vw; }
+        }
+        
+        @media (max-height: 800px) {
+            th, td { padding: 12px 10px; }
+            .queued-token { padding: 5px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>District Treasury Trivandrum</h1>
+        </div>
+        
+        <div class="content">
+            <div class="table-container" id="token-table">
+                <div class="loading">Loading token data...</div>
+            </div>
+        </div>
+        
+        <!-- Scroll reel area -->
+        <div class="scroll-reel-container" id="scroll-reel-container">
+            <div class="scroll-reel">
+                <div class="scroll-reel-content" id="scroll-reel-content"></div>
+            </div>
+        </div>
+        
+        <div class="footer" style="display:none;">
+            <div class="clock" id="clock"></div>
+        </div>
+    </div>
+
+    <script>
+        // Google Sheets API configuration
+        const SPREADSHEET_ID = '11AWbKR2rR2YQYm6AdjEQsw-na9QObL0wfw6eAi4MEdM';
+        const API_KEY = 'AIzaSyBAuS3Brpsw5JOJnjNJii1UlFa7ClXf8d4';
+        const SHEET_NAME = '101';
+        const SETTINGS_SHEET = 'settings';
+        
+        // Voice files configuration
+        const VOICE_BASE_URL = 'https://itcelldto.github.io/try/apps/dt-token/voices/';
+        const VOICE_FILES = [
+            '0.wav', '1.wav', '2.wav', '3.wav', '4.wav',
+            '5.wav', '6.wav', '7.wav', '8.wav', '9.wav',
+            'counterNo.wav', 'token_no.wav'
+        ];
+        
+        // Audio cache
+        const audioCache = new Map();
+        
+        // Store previous token data for comparison
+        let previousTokenData = {};
+        
+        // Preload notification bell sound
+        const notificationBell = new Audio("http://itcelltreasury.github.io/try/bell.mp3");
+        
+        // Dynamic font sizing variables
+        let baseFontSize = 2.5; // Base font size in vw
+        let maxRowsToShow = 8; // Ideal number of rows to show without scrolling
+        
+        // Preload all voice files
+        function preloadVoiceFiles() {
+            console.log('Preloading voice files...');
+            VOICE_FILES.forEach(filename => {
+                const audio = new Audio();
+                audio.src = VOICE_BASE_URL + filename;
+                audio.preload = 'auto';
+                audioCache.set(filename, audio);
+                
+                // Force load by playing and immediately pausing
+                audio.load();
+            });
+            console.log('Voice files preloading initiated');
+        }
+        
+        // Calculate dynamic font sizes based on number of counters
+        function calculateDynamicFontSizes(counterCount) {
+            const tableContainer = document.getElementById('token-table');
+            const containerHeight = tableContainer.clientHeight;
+            
+            // Calculate font sizes based on number of rows
+            let fontSize;
+            if (counterCount <= 3) {
+                fontSize = Math.min(3.5, baseFontSize + 1); // Larger fonts for fewer counters
+            } else if (counterCount <= 6) {
+                fontSize = baseFontSize; // Normal size
+            } else if (counterCount <= 10) {
+                fontSize = Math.max(1.8, baseFontSize - 0.7); // Smaller for more counters
+            } else {
+                fontSize = Math.max(1.5, baseFontSize - 1); // Even smaller for many counters
+            }
+            
+            // Apply font sizes
+            const tableElements = document.querySelectorAll('th, td, .current-token, .queued-token');
+            tableElements.forEach(element => {
+                if (element.classList.contains('current-token')) {
+                    element.style.fontSize = (fontSize + 0.5) + 'vw';
+                } else if (element.classList.contains('queued-token')) {
+                    element.style.fontSize = (fontSize - 0.3) + 'vw';
+                } else if (element.tagName === 'TH') {
+                    element.style.fontSize = (fontSize + 0.5) + 'vw';
+                } else {
+                    element.style.fontSize = fontSize + 'vw';
+                }
+            });
+            
+            // Adjust scroll reel font size
+            const scrollReel = document.getElementById('scroll-reel-content');
+            if (scrollReel) {
+                scrollReel.style.fontSize = Math.max(1.8, fontSize - 0.7) + 'vw';
+            }
+            
+            // Adjust header and clock fonts
+            document.querySelector('h1').style.fontSize = Math.min(4, fontSize + 1) + 'vw';
+            document.querySelector('.clock').style.fontSize = Math.max(1.8, fontSize - 0.7) + 'vw';
+        }
+        
+        // Play individual digit voice
+        function playDigitVoice(digit) {
+            return new Promise((resolve) => {
+                const filename = `${digit}.wav`;
+                const audio = audioCache.get(filename);
+                
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play().then(() => {
+                        audio.onended = resolve;
+                    }).catch(error => {
+                        console.warn(`Could not play ${filename}:`, error);
+                        resolve();
+                    });
+                } else {
+                    console.warn(`Voice file not found: ${filename}`);
+                    resolve();
+                }
+            });
+        }
+        
+        // Announce token in digit-by-digit format
+        async function announceTokenDigitByDigit(section, tokenNumber) {
+            if (!audioCache.size) {
+                console.warn('Voice files not loaded yet');
+                return;
+            }
+            
+            try {
+                // Play "token_no.wav"
+                const tokenAudio = audioCache.get('token_no.wav');
+                if (tokenAudio) {
+                    tokenAudio.currentTime = 0;
+                    await tokenAudio.play();
+                    await new Promise(resolve => tokenAudio.onended = resolve);
+                }
+                
+                // Convert token number to individual digits
+                const tokenDigits = tokenNumber.toString().split('');
+                
+                // Play each digit separately
+                for (const digit of tokenDigits) {
+                    await playDigitVoice(digit);
+                    // Small pause between digits
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                // Play "counterNo.wav"
+                const counterAudio = audioCache.get('counterNo.wav');
+                if (counterAudio) {
+                    counterAudio.currentTime = 0;
+                    await counterAudio.play();
+                    await new Promise(resolve => counterAudio.onended = resolve);
+                }
+                
+                // Extract counter number from section (assuming section is like "Counter 1", "Counter 2", etc.)
+                const counterMatch = section.match(/\d+/);
+                if (counterMatch) {
+                    const counterDigits = counterMatch[0].split('');
+                    for (const digit of counterDigits) {
+                        await playDigitVoice(digit);
+                        // Small pause between digits
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error in token announcement:', error);
+            }
+        }
+        
+        // Function to fetch data from Google Sheets
+        async function fetchTokenData() {
+            try {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return processData(data.values);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('token-table').innerHTML = 
+                    '<div class="loading">Error loading token data. Please try again later.</div>';
+                return null;
+            }
+        }
+        
+        // Function to fetch scroll reel content
+        async function fetchScrollReelContent() {
+            try {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SETTINGS_SHEET}!C2:C?key=${API_KEY}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return processScrollReelData(data.values);
+            } catch (error) {
+                console.error('Error fetching scroll reel content:', error);
+                return null;
+            }
+        }
+        
+        // Process scroll reel data
+        function processScrollReelData(values) {
+            if (!values || values.length === 0) return null;
+            
+            // Combine all non-empty cells into a single string
+            let content = '';
+            for (let i = 0; i < values.length; i++) {
+                if (values[i] && values[i][0] && values[i][0].trim() !== '') {
+                    content += values[i][0] + ' • ';
+                }
+            }
+            
+            // Remove the last separator
+            if (content.endsWith(' • ')) {
+                content = content.slice(0, -3);
+            }
+            
+            return content;
+        }
+        
+        // Process the data from Google Sheets
+        function processData(values) {
+            if (!values || values.length < 2) return {};
+            
+            // Extract headers and rows
+            const headers = values[0];
+            const rows = values.slice(1);
+            
+            // Create a map to organize tokens by section
+            const sectionsMap = {};
+            
+            // Process each row
+            rows.forEach(row => {
+                if (row.length < headers.length) return;
+                
+                const section = row[1]; // Column B: section
+                const tokenNo = parseInt(row[2]); // Column C: tokenNo
+                const status = row[5]; // Column F: status
+                
+                if (!sectionsMap[section]) {
+                    sectionsMap[section] = {
+                        currentToken: null,
+                        queuedTokens: []
+                    };
+                }
+                
+                if (status === 'Pass') {
+                    // Update current token if this token number is higher
+                    if (!sectionsMap[section].currentToken || tokenNo > sectionsMap[section].currentToken) {
+                        sectionsMap[section].currentToken = tokenNo;
+                    }
+                } else if (status === 'In Que') {
+                    sectionsMap[section].queuedTokens.push(tokenNo);
+                }
+            });
+            
+            // Sort queued tokens for each section
+            for (const section in sectionsMap) {
+                sectionsMap[section].queuedTokens.sort((a, b) => a - b);
+            }
+            
+            return sectionsMap;
+        }
+        
+        // Check for changes and announce if needed
+        function checkForChangesAndAnnounce(newData) {
+            if (!newData || Object.keys(previousTokenData).length === 0) {
+                previousTokenData = JSON.parse(JSON.stringify(newData));
+                return;
+            }
+            
+            // Check each section for changes
+            for (const section in newData) {
+                if (previousTokenData[section]) {
+                    const newToken = newData[section].currentToken;
+                    const oldToken = previousTokenData[section].currentToken;
+                    
+                    if (newToken !== oldToken && newToken !== null) {
+                        // Token has changed, play bell and announce it
+                        playNotificationBell().then(() => {
+                            announceTokenDigitByDigit(section, newToken);
+                        });
+                    }
+                }
+            }
+            
+            // Update previous data
+            previousTokenData = JSON.parse(JSON.stringify(newData));
+        }
+        
+        // Play notification bell sound
+        function playNotificationBell() {
+            return new Promise((resolve) => {
+                notificationBell.currentTime = 0;
+                notificationBell.play();
+                notificationBell.onended = resolve;
+            });
+        }
+        
+        // Generate the HTML table from processed data
+        function generateTable(data) {
+            if (!data || Object.keys(data).length === 0) {
+                return '<div class="loading">No token data available</div>';
+            }
+            
+            // Get sections and sort them in ascending order
+            const sortedSections = Object.keys(data).sort((a, b) => {
+                // Extract numbers from section names for proper numerical sorting
+                const numA = parseInt(a.replace(/\D/g, '')) || 0;
+                const numB = parseInt(b.replace(/\D/g, '')) || 0;
+                return numA - numB;
+            });
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Token</th>
+                            <th>In Queue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // Iterate through sorted sections
+            for (const section of sortedSections) {
+                const sectionData = data[section];
+                html += `
+                    <tr>
+                        <td>${section}</td>
+                        <td class="current-token">${sectionData.currentToken || '--'}</td>
+                        <td>
+                `;
+                
+                if (sectionData.queuedTokens.length > 0) {
+                    sectionData.queuedTokens.forEach(token => {
+                        html += `<span class="queued-token">${token}</span>`;
+                    });
+                } else {
+                    html += '--';
+                }
+                
+                html += `
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            return html;
+        }
+        
+        // Update the table with new data
+        async function updateTable() {
+            const data = await fetchTokenData();
+            if (data) {
+                checkForChangesAndAnnounce(data);
+                document.getElementById('token-table').innerHTML = generateTable(data);
+                
+                // Calculate and apply dynamic font sizes based on number of counters
+                const counterCount = Object.keys(data).length;
+                calculateDynamicFontSizes(counterCount);
+            }
+        }
+        
+        // Update scroll reel content
+        async function updateScrollReel() {
+            const content = await fetchScrollReelContent();
+            const container = document.getElementById('scroll-reel-container');
+            const contentElement = document.getElementById('scroll-reel-content');
+            
+            if (content && content.trim() !== '') {
+                contentElement.textContent = content;
+                container.style.display = 'block';
+                
+                // Apply dynamic font size to scroll reel
+                const counterCount = Object.keys(previousTokenData).length;
+                calculateDynamicFontSizes(counterCount);
+            } else {
+                container.style.display = 'none';
+            }
+        }
+        
+        // Update clock function
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            const dateStr = now.toLocaleDateString();
+            document.getElementById('clock').textContent = `${dateStr} | ${timeStr}`;
+        }
+        
+        // Initial load - preload voices first, then load data
+        window.addEventListener('load', function() {
+            preloadVoiceFiles();
+            updateTable();
+            updateClock();
+            updateScrollReel();
+            
+            // Set up periodic refresh
+            setInterval(updateTable, 2000);
+            setInterval(updateClock, 1000);
+            setInterval(updateScrollReel, 30000);
+            
+            // Recalculate fonts on window resize
+            window.addEventListener('resize', function() {
+                const counterCount = Object.keys(previousTokenData).length;
+                if (counterCount > 0) {
+                    calculateDynamicFontSizes(counterCount);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
