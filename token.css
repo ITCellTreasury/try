@@ -1,0 +1,341 @@
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            background-color: #ffffff;
+            border: 3px solid #2ecc71;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
+        }
+        
+        .header {
+            background: linear-gradient(to right, #3498db, #2ecc71,#3498db);
+            text-align: center;
+            border-bottom: 3px solid #e74c3c;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .header-content {
+            flex: 1;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            font-size: 2.2vw;
+            font-weight: 700;
+        }
+        
+        .datetime-container {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: right;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .date-display {
+            font-size: 1.5vw;
+            margin-bottom: 2px;
+        }
+        
+        .time-display {
+            font-size: 2vw;
+            font-weight: 700;
+        }
+        
+        .content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            font-weight: 600;
+            padding: 20px 10px;
+            height: 80px; /* Fixed row height */
+            vertical-align: middle;
+        }
+        
+        th {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            font-size: 2.5vw;
+        }
+        
+        tr {
+            height: 80px; /* Ensure all rows have same height */
+        }
+        
+        tr:nth-child(even) {
+            background-color: #ecf0f1;
+        }
+        
+        tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        
+        tr:hover {
+            background-color: #d5dbdb;
+        }
+        
+        .current-token {
+            font-weight: bold;
+            color: #e74c3c;
+            text-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+            font-size: 3vw;
+        }
+        
+        .queued-tokens-container {
+            max-height: 60px; /* Limit to single line */
+            overflow: hidden; /* Hide overflow instead of scroll */
+            white-space: nowrap;
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+        
+        .queued-tokens-wrapper {
+            display: inline-flex;
+            gap: 8px;
+            padding: 5px;
+            max-width: 100%;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+        
+        .queued-token {
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+            min-width: 40px;
+            text-align: center;
+            display: inline-block;
+            font-size: 1.8vw;
+            flex-shrink: 0;
+        }
+        
+        .more-tokens-indicator {
+            background-color: #7f8c8d;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.8vw;
+            margin-left: 5px;
+            cursor: default;
+            flex-shrink: 0;
+        }
+        
+        .no-queue-message {
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 1.8vw;
+        }
+        
+        /* Column width adjustments */
+        th:nth-child(1), td:nth-child(1) { /* Section column */
+            width: 35%;
+        }
+        
+        th:nth-child(2), td:nth-child(2) { /* Token column */
+            width: 20%;
+        }
+        
+        th:nth-child(3), td:nth-child(3) { /* In Queue column */
+            width: 45%;
+        }
+        
+        /* Styles for rows with no queue */
+        .no-queue-row {
+            background-color: #f9f9f9 !important;
+            color: #95a5a6;
+        }
+        
+        .no-queue-row .current-token {
+            color: #95a5a6;
+        }
+        
+        /* Scroll reel styles */
+        .scroll-reel-container {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+           
+            border-top: 2px solid #e74c3c;
+            border-bottom: 2px solid #e74c3c;
+            overflow: hidden;
+            position: relative;
+            display: none;
+        }
+        
+        .scroll-reel {
+            white-space: nowrap;
+            animation: scroll 30s linear infinite;
+        }
+        
+        .scroll-reel-content {
+            display: inline-block;
+            padding-right: 50px;
+            color: #ffffff;
+			 font-size: 2.2vw;
+            font-weight: bold;
+        }
+        
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .footer {
+		display:none;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            padding: 10px;
+            text-align: center;
+            border-top: 3px solid #e74c3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #3498db;
+            font-weight: 600;
+            font-size: 2.5vw;
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #e74c3c;
+            font-weight: 600;
+            font-size: 2.5vw;
+        }
+        
+        /* Animation for current token */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .current-token {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            th, td { padding: 15px 8px; }
+            .queued-token, .more-tokens-indicator { 
+                padding: 6px 10px; 
+                min-width: 35px; 
+            }
+            .date-display { font-size: 1.8vw; }
+            .time-display { font-size: 2.3vw; }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                padding: 10px 5px;
+                text-align: center;
+            }
+            
+            .datetime-container {
+                position: static;
+                transform: none;
+                margin-top: 5px;
+                align-items: center;
+                width: 100%;
+            }
+            
+            .date-display { 
+                font-size: 2.5vw; 
+                margin-bottom: 1px;
+            }
+            
+            .time-display { 
+                font-size: 3vw; 
+            }
+            
+            h1 { 
+                font-size: 4.5vw; 
+                margin-bottom: 5px;
+            }
+            
+            th, td { 
+                padding: 10px 5px; 
+                height: 70px;
+            }
+            tr { height: 70px; }
+            th { font-size: 2.8vw; }
+            .current-token { font-size: 3.5vw; }
+            .queued-token, .more-tokens-indicator, .no-queue-message { 
+                font-size: 2.5vw;
+                padding: 5px 8px; 
+                min-width: 30px;
+            }
+        }
+        
+        @media (max-height: 800px) {
+            th, td { 
+                padding: 10px 5px;
+                height: 60px;
+            }
+            tr { height: 60px; }
+            .queued-tokens-container { max-height: 50px; }
+        }
+    
