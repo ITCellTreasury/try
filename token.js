@@ -5,7 +5,7 @@
         const SETTINGS_SHEET = 'settings';
         
         // Voice files configuration
-        const VOICE_BASE_URL = 'https://itcelldto.github.io/try/apps/dt-token/voices/';
+        const VOICE_BASE_URL = './voices/';
         
         // Store section voice files that have been loaded
         const sectionVoiceCache = new Map();
@@ -27,7 +27,7 @@
         const MAX_RETRIES = 3;
         
         // Preload notification bell sound
-        const notificationBell = new Audio("https://itcelltreasury.github.io/try/bell.mp3");
+        const notificationBell = new Audio("./voices/bell.mp3");
         
         // Common voice files to preload - ONLY DIGIT FILES
         const COMMON_VOICE_FILES = [
